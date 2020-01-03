@@ -63,18 +63,18 @@ public class tab1 extends Fragment {
 
     private View v;
     TextView tvData;
+    private String id=SubActivity.user_id;
     Context tab1;
-
-
     public tab1() {
         // Required empty public constructor
     }
 
-    private void start() {
+    private void start() throws JSONException {
         RecyclerView rv = v.findViewById(R.id.contact);
 
         List<A_DATA> datas = new ArrayList<>();
         JSONObject jsonObject_each = new JSONObject();
+        jsonObject_each.accumulate("id",id);
         ContentResolver resolver = getContext().getContentResolver();
         tvData = (TextView)v.findViewById(R.id.textView);
 
@@ -198,8 +198,13 @@ public class tab1 extends Fragment {
             per_array = permissions.toArray(per_array);
             requestPermissions(per_array, 1);
         }
-        else
-            start();
+        else {
+            try {
+                start();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
         return v;
     }
 
@@ -298,9 +303,17 @@ public class tab1 extends Fragment {
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
         if (requestCode == 1) {
             if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                start();
+                try {
+                    start();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }else if (grantResults.length == 2 && grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
-                start();
+                try {
+                    start();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }else
                 getActivity().finish();
         }

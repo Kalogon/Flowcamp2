@@ -24,6 +24,7 @@ import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Arrays;
@@ -121,6 +122,11 @@ public class MainActivity extends AppCompatActivity {
                         public void onCompleted(JSONObject object, GraphResponse response) {
                             Log.e("result",object.toString());
                             Intent intent=new Intent(getApplicationContext(),SubActivity.class);
+                            try {
+                                intent.putExtra("user_id",object.getString("id"));
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
                             startActivity(intent);
                             finish();
                         }

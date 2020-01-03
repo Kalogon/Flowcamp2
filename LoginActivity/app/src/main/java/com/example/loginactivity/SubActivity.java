@@ -19,7 +19,7 @@ public class SubActivity extends AppCompatActivity {
     private TabItem tab1, tab2, tab3;
     public PagerAdapter pagerAdapter;
     static ArrayList<Bitmap> im_array;
-    public static String username = "han";
+    public static String user_id;
 
     public static final String SP_NAME = "image_sf";
 
@@ -33,7 +33,7 @@ public class SubActivity extends AppCompatActivity {
         tab2 = findViewById(R.id.Tab2);
         tab3 = findViewById(R.id.Tab3);
         viewPager = findViewById(R.id.viewpager);
-
+        user_id=getIntent().getStringExtra("user_id");
         pagerAdapter = new PageAdapter(getSupportFragmentManager(), tablayout.getTabCount());
         viewPager.setAdapter(pagerAdapter);
 
