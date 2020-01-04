@@ -1,5 +1,6 @@
 package com.example.loginactivity;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -8,6 +9,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -47,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
     private LoginCallback mLoginCallback;
     private Button btn_custom_login;
     private CallbackManager mCallbackManager;
-
+    String user_info = "";
 
     @Override
 
@@ -93,6 +95,7 @@ public class MainActivity extends AppCompatActivity {
         mCallbackManager.onActivityResult(requestCode, resultCode, data);
         super.onActivityResult(requestCode, resultCode, data);
 
+
     }
 
 
@@ -129,7 +132,7 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void onCompleted(JSONObject object, GraphResponse response) {
                             Log.e("result", object.toString());
-                            Intent intent = new Intent(getApplicationContext(), SubActivity.class);
+
                             String id="";
                             String name="";
                             try {
@@ -138,8 +141,6 @@ public class MainActivity extends AppCompatActivity {
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
-                            intent.putExtra("user_id", id);
-                            intent.putExtra("user_name", name);
                             try {
                                 jsonuser.accumulate("user_id", id);
                                 jsonuser.accumulate("user_name", name);
@@ -147,8 +148,7 @@ public class MainActivity extends AppCompatActivity {
                                 e.printStackTrace();
                             }
                             new JSONTask(jsonuser, null).execute("http://192.249.19.254:7180/login");
-                            startActivity(intent);
-                            finish();
+
                         }
                     });
             Bundle parameters = new Bundle();
@@ -158,9 +158,10 @@ public class MainActivity extends AppCompatActivity {
 
         }
 
-        public class JSONTask extends AsyncTask<String, String, String> {
+        public class JSONTask extends AsyncTask<String, String, String>{
             JSONObject jsonObject_user = new JSONObject();
             JSONArray jsonarray = new JSONArray();
+
 
             public JSONTask(JSONObject jsonObject_user, JSONArray jsonarray) {
                 this.jsonarray = jsonarray;
@@ -234,6 +235,14 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 return null;
+            }
+            protected void onPostExecute(String result) {
+                super.onPostExecute(result);
+                Intent intent = new Intent(getApplicationContext(), SubActivity.class);
+                user_info = result;
+                intent.putExtra("user", user_info);
+                startActivity(intent);
+                finish();
             }
         }
     }

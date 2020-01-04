@@ -64,6 +64,7 @@ public class tab1 extends Fragment {
 
     private View v;
     TextView tvData;
+    JSONObject user;
     private String id=SubActivity.user_id;
     Context tab1;
     private String name=SubActivity.user_name;
@@ -74,49 +75,70 @@ public class tab1 extends Fragment {
 
     private void start() throws JSONException {
         RecyclerView rv = v.findViewById(R.id.contact);
-
+        user=SubActivity.user;
         List<A_DATA> datas = new ArrayList<>();
-        JSONObject jsonObject_user = new JSONObject();
-        JSONArray jsonarray=new JSONArray();
-        jsonObject_user.accumulate("user_id",id);
-        jsonObject_user.accumulate("user_name",name);
-        jsonarray.put(jsonObject_user);
-        ContentResolver resolver = getContext().getContentResolver();
-        tvData = (TextView)v.findViewById(R.id.textView);
-
-        Uri phoneUri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI;
-
-        String [] proj = {ContactsContract.CommonDataKinds.Phone.CONTACT_ID,
-                ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
-                ContactsContract.CommonDataKinds.Phone.NUMBER,
-                ContactsContract.CommonDataKinds.Phone.PHOTO_URI};
-
-
-        Cursor cursor = resolver.query(phoneUri, proj, null, null, null);
-        if (cursor != null) {
-            while (cursor.moveToNext()) {
-                int id = cursor.getInt(cursor.getColumnIndex(proj[0]));
-                String name = cursor.getString(cursor.getColumnIndex(proj[1]));
-                String tel = cursor.getString(cursor.getColumnIndex(proj[2]));
-                String image = cursor.getString(cursor.getColumnIndex(proj[3]));
-                A_DATA data = new A_DATA(id, name, tel, image);
+        JSONArray temp = new JSONArray();
+        temp=new JSONArray(user.getString("friends"));
+        if(temp.length()!=0){
+            for(int i=0;i<temp.length();i++){
+                String element1=temp.getJSONObject(i).getString("friend");
+                String element2=temp.getJSONObject(i).getString("phonenumber");
+                A_DATA data = new A_DATA(1, element1, element2, null);
                 datas.add(data);
-
-                JSONObject temp=new JSONObject();
-                temp.accumulate("friend_id",data.getId());
-                temp.accumulate("friend_number",data.getTel());
-                temp.accumulate("friend_name",data.getName());
-                jsonarray.put(temp);
             }
+            mAdapter my_adapter = new mAdapter(getContext(), datas);
+
+            rv.setAdapter(my_adapter);
+            rv.setLayoutManager(new LinearLayoutManager(getContext()));
         }
-        cursor.close();
+        else{
 
-        mAdapter my_adapter = new mAdapter(getContext(), datas);
 
-        rv.setAdapter(my_adapter);
-        rv.setLayoutManager(new LinearLayoutManager(getContext()));
+            JSONObject jsonObject_user = new JSONObject();
+            JSONArray jsonarray=new JSONArray();
+            jsonObject_user.accumulate("user_id",user.getString("userid"));
+            jsonObject_user.accumulate("user_name",user.getString("username"));
 
-        new JSONTask(jsonObject_user,jsonarray).execute("http://192.249.19.254:7180/phonePost");
+            jsonarray.put(jsonObject_user);
+            ContentResolver resolver = getContext().getContentResolver();
+
+            Uri phoneUri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI;
+
+            String [] proj = {ContactsContract.CommonDataKinds.Phone.CONTACT_ID,
+                    ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
+                    ContactsContract.CommonDataKinds.Phone.NUMBER,
+                    ContactsContract.CommonDataKinds.Phone.PHOTO_URI};
+
+
+            Cursor cursor = resolver.query(phoneUri, proj, null, null, null);
+            if (cursor != null) {
+                while (cursor.moveToNext()) {
+                    int id = cursor.getInt(cursor.getColumnIndex(proj[0]));
+                    String name = cursor.getString(cursor.getColumnIndex(proj[1]));
+                    String tel = cursor.getString(cursor.getColumnIndex(proj[2]));
+                    String image = cursor.getString(cursor.getColumnIndex(proj[3]));
+                    A_DATA data = new A_DATA(id, name, tel, image);
+                    datas.add(data);
+
+                    JSONObject temp2=new JSONObject();
+                    temp2.accumulate("friend_id",data.getId());
+                    temp2.accumulate("friend_number",data.getTel());
+                    temp2.accumulate("friend_name",data.getName());
+                    jsonarray.put(temp2);
+                }
+            }
+            cursor.close();
+
+            mAdapter my_adapter = new mAdapter(getContext(), datas);
+
+            rv.setAdapter(my_adapter);
+            rv.setLayoutManager(new LinearLayoutManager(getContext()));
+
+            new JSONTask(jsonObject_user,jsonarray).execute("http://192.249.19.254:7180/phonePost");
+
+
+        }
+        System.out.println(datas);
     }
 
     @Override
@@ -390,7 +412,6 @@ public class tab1 extends Fragment {
         @Override
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
-            tvData.setText(result);//서버로 부터 받은 값을 출력해주는 부
         }
     }
 
