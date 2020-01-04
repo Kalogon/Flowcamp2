@@ -3,16 +3,9 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <Button
-        android:id="@+id/button"
-        android:layout_width="54dp"
-        android:layout_height="47dp"
-        android:layout_gravity="top|right"
-        android:visibility="visible" />
-
-    <androidx.viewpager.widget.ViewPager
-        android:id="@+id/full_view"
+    <ImageView
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:id="@+id/imageView"/>
 
 </FrameLayout>

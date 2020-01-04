@@ -5,6 +5,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ClipData;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -15,13 +16,18 @@ import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.media.ExifInterface;
 import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import android.provider.MediaStore;
+import android.text.TextUtils;
 import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,10 +37,32 @@ import android.widget.Button;
 import android.widget.GridView;
 import android.widget.Toast;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
+import com.github.javiersantos.materialstyleddialogs.MaterialStyledDialog;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.rengwuxian.materialedittext.MaterialEditText;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 
 /**
@@ -42,26 +70,18 @@ import java.util.ArrayList;
  */
 public class tab2 extends Fragment {
 
-    private static final int PICK_FROM_ALBUM = 1;
-    private static final int SHOW_FULL_IMAGE = 2;
+    Context tab2;
+    static final int REQUEST_PERMISSION_KEY = 1;
+    GridView galleryGridView;
+    View view;
     private boolean is_delete;
     private ArrayList<Bitmap> im_array;
-    private SharedPreferences sf;
-    private SharedPreferences.Editor editor;
     private ImageAdapter imageAdapter;
+    private String[] images;
+    private String username = SubActivity.username;
 
-    public tab2() {
-        sf = SubActivity.sharedPreferences;
-        editor = sf.edit();
-
-        int image_number = sf.getInt("size", 0);
-
-        im_array = SubActivity.im_array;
-        for (int i = 0; i < image_number; i++) {
-            String image = sf.getString(String.valueOf(i), "");
-            im_array.add(StringToBitmap(image));
-        }
-        is_delete = false;
+    public void onCreate(Bundle savedInstanceState)  {
+        super.onCreate(savedInstanceState);
     }
 
 
@@ -69,207 +89,256 @@ public class tab2 extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_tab2, container, false);
+        tab2 = container.getContext();
         GridView gv = v.findViewById(R.id.grid_view);
-        final Button delete = v.findViewById(R.id.d_button);
-        Button gallery = v.findViewById(R.id.g_button);
-        Button saving = v.findViewById(R.id.s_button);
 
-        imageAdapter = new ImageAdapter(getActivity(), im_array);
-        gv.setAdapter(imageAdapter);
+        String[] PERMISSIONS = {Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.CAMERA};
+        if(!MainActivity.hasPermissions(tab2.getApplicationContext(), PERMISSIONS)){
+            ActivityCompat.requestPermissions(getActivity(), PERMISSIONS, REQUEST_PERMISSION_KEY);
+        }
 
-        gv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View v,
-                                    int position, long id) {
-                final int index = position;
-                if (is_delete) {
-                    AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
-                    dialog.setTitle("IMAGE DELETE")
-                            .setMessage("Do you really want to delete the image?")
-                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    im_array.remove(index);
 
-                                    imageAdapter.notifyDataSetChanged();
+        new JSONTaskUrl().execute("http://192.249.19.254:8180/urlsGet", username);
 
-                                    delete.setClickable(true);
-                                    delete.setVisibility(View.VISIBLE);
-                                    Toast.makeText(getContext(), "Delete image successly", Toast.LENGTH_LONG).show();
-                                    is_delete = false;
-                                }
-                            })
-                            .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    delete.setClickable(true);
-                                    delete.setVisibility(View.VISIBLE);
-                                    is_delete = false;
-                                }
-                            }).show();
-                }else {
-                    Intent i = new Intent(getContext(), make_full.class);
-                    i.putExtra("id", position);
-                    startActivityForResult(i, SHOW_FULL_IMAGE);
-                }
-            }
-        });
 
-        delete.setOnClickListener(new View.OnClickListener() {
+
+        FloatingActionButton btnCamera = (FloatingActionButton) v.findViewById(R.id.Btn_camera);
+        btnCamera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getContext(), "Click the image what you want to delete", Toast.LENGTH_SHORT).show();
-                is_delete = true;
-                delete.setClickable(false);
-                delete.setVisibility(View.INVISIBLE);
+                Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                startActivityForResult(cameraIntent,1);
             }
         });
 
-        gallery.setOnClickListener(new View.OnClickListener() {
+
+
+        FloatingActionButton btnRefresh = (FloatingActionButton) v.findViewById(R.id.Btn_refresh);
+        btnRefresh.setOnClickListener(new View.OnClickListener(){
             @Override
-            public void onClick(View v) {
-                if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                    if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE))
-                        Toast.makeText(getContext(), "We need your permission for reading your gallery.", Toast.LENGTH_SHORT).show();
-                    requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
-                } else
-                    go_album();
+            public void onClick(View v){
+                new JSONTaskUrl().execute("http://192.249.19.254:8180/urlsGet", username);
             }
         });
 
-        saving.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(getContext(), "We are now saving.", Toast.LENGTH_SHORT).show();
-                editor.clear();
-                for (int i = 0; i < im_array.size(); i++) {
-                    editor.putString(String.valueOf(i), BitmapToString(im_array.get(i)));
-                }
-                editor.putInt("size", im_array.size());
-                editor.commit();
-                Toast.makeText(getContext(), "saving finished.", Toast.LENGTH_SHORT).show();
-            }
-        });
+
         // Inflate the layout for this fragment
         return v;
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
-        if (requestCode == 1) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                go_album();
-            }else
-                getActivity().finish();
-        }
-    }
+    public class JSONTaskUrl extends AsyncTask<String, String, String> {
 
-    private void go_album() {
-        Intent intent = new Intent(Intent.ACTION_PICK);
-        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-        intent.setType(MediaStore.Images.Media.CONTENT_TYPE);
-        startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_FROM_ALBUM);
-    }
+        @Override
+        protected String doInBackground(String... parms) {
+            try {
+                JSONObject jsonObject = new JSONObject();
+                String username = parms[1];
+                jsonObject.accumulate("name", username);
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode != Activity.RESULT_OK) {
-            Toast.makeText(getContext(), "ALBUM CANCEL" ,Toast.LENGTH_SHORT).show();
-            return;
-        }
+                HttpURLConnection con = null;
+                BufferedReader reader = null;
 
-        if (requestCode == PICK_FROM_ALBUM) {
-            Uri photoUri = data.getData();
-            ClipData clipData = data.getClipData();
+                try {
+                    URL url = new URL(parms[0]);
+                    con = (HttpURLConnection) url.openConnection();
+                    con.setRequestMethod("POST");
+                    con.setRequestProperty("Cache-Control", "no-cache");
+                    con.setRequestProperty("Content-Type", "application/json");
 
-            if (clipData != null) {
-                for (int i = 0; i < clipData.getItemCount(); i++) {
-                    Bitmap bitmap = null;
+                    con.setRequestProperty("Accept", "text/html");
+                    con.setDoOutput(true);
+                    con.setDoInput(true);
+                    con.connect();
+
+                    OutputStream outStream = con.getOutputStream();
+                    BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outStream));
+                    writer.write(jsonObject.toString());
+                    writer.flush();
+                    writer.close();
+
+                    InputStream stream = con.getInputStream();
+                    reader = new BufferedReader(new InputStreamReader(stream));
+                    StringBuffer buffer = new StringBuffer();
+                    String line = "";
+                    while ((line = reader.readLine()) != null)
+                        buffer.append(line);
+
+
+                    return buffer.toString();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    if (con != null)
+                        con.disconnect();
                     try {
-                        bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), clipData.getItemAt(i).getUri());
-                    } catch (FileNotFoundException e) {
-                        e.printStackTrace();
+                        if (reader != null)
+                            reader.close();
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-
-                    Cursor cursor = getContext().getContentResolver().query(clipData.getItemAt(i).getUri(), null, null, null, null);
-                    cursor.moveToNext();
-                    String imagePath = cursor.getString(cursor.getColumnIndex("_data"));
-                    cursor.close();
-                    ExifInterface exifInterface = null;
-                    try {
-                        exifInterface = new ExifInterface(imagePath);
-                    }catch (FileNotFoundException e) {
-                        e.printStackTrace();
-                    }catch(IOException e) {
-                        e.printStackTrace();
-                    }
-                    int a = exifInterface.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
-                    int degree = 0;
-                    if (a == ExifInterface.ORIENTATION_ROTATE_90)
-                        degree = 90;
-                    else if (a == ExifInterface.ORIENTATION_ROTATE_180)
-                        degree = 180;
-                    else if (a == ExifInterface.ORIENTATION_ROTATE_270)
-                        degree = 270;
-
-                    Matrix matrix = new Matrix();
-                    matrix.setRotate(degree, (float) bitmap.getWidth() / 2, (float) bitmap.getHeight() / 2);
-
-                    Bitmap tmpBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-                    if (bitmap != tmpBitmap) {
-                        bitmap.recycle();
-                        bitmap = tmpBitmap;
-                    }
-
-                    im_array.add(bitmap);
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-            else if (photoUri != null){
-                Bitmap bitmap = null;
+
+            return null;
+        }//       @Override
+//        protected void onPostExecute(String result) {
+//            super.onPostExecute(result);
+//
+//            if (result.equals("\"No images\"")){
+//                return;
+//            }else{
+//                try{
+//                    JSONObject jsonObject = new JSONObject(result);
+//                    JSONArray jsonArray = jsonObject.getJSONArray("image_urls");
+//
+//                    images = new String[jsonArray.length()];
+//                    for(int i=0; i<jsonArray.length(); i++)
+//                        images[i] = jsonArray.get(i).toString();
+//
+//                    galleryGridView = (GridView) view.findViewById(R.id.grid_view);
+//                    ImageAdapter imageGridAdapter = new ImageAdapter(tab2, images);
+//                    galleryGridView.setAdapter(imageGridAdapter);
+//
+//                }catch (Exception e){ e.printStackTrace(); }
+//
+//            }
+//        }
+    }
+
+
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(resultCode!=0) {
+            if (requestCode == 1 && !data.equals(null)) {
                 try {
-                    bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), photoUri);
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                    final Bitmap newImage = (Bitmap) data.getExtras().get("data");
+                    final View layout_camera = LayoutInflater.from(tab2).inflate(R.layout.layout_camera, null);
+                    new MaterialStyledDialog.Builder(tab2)
+                            .setIcon(R.drawable.ic_launcher_foreground)
+                            .setTitle("Add Image to server")
+                            .setCustomView(layout_camera)
+                            .setNegativeText("CANCEL")
+                            .onNegative(new MaterialDialog.SingleButtonCallback() {
+                                @Override
+                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                    dialog.dismiss();
+                                }
+                            })
+                            .setPositiveText("ADD")
+                            .onPositive(new MaterialDialog.SingleButtonCallback() {
+                                @Override
+                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                    MaterialEditText edt_image_name = (MaterialEditText) layout_camera.findViewById(R.id.edit_image);
 
-                Cursor cursor = getContext().getContentResolver().query(photoUri, null, null, null, null);
-                cursor.moveToNext();
-                String imagePath = cursor.getString(cursor.getColumnIndex("_data"));
-                cursor.close();
-                ExifInterface exifInterface = null;
-                try {
-                    exifInterface = new ExifInterface(imagePath);
-                }catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                }catch(IOException e) {
-                    e.printStackTrace();
-                }
-                int a = exifInterface.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
-                int degree = 0;
-                if (a == ExifInterface.ORIENTATION_ROTATE_90)
-                    degree = 90;
-                else if (a == ExifInterface.ORIENTATION_ROTATE_180)
-                    degree = 180;
-                else if (a == ExifInterface.ORIENTATION_ROTATE_270)
-                    degree = 270;
+                                    if(TextUtils.isEmpty(edt_image_name.getText().toString())){
+                                        Toast.makeText(tab2, "Please set image name", Toast.LENGTH_SHORT).show();
+                                        return;
+                                    }
+                                    String newImage_string = BitmapToString(newImage);
 
-                Matrix matrix = new Matrix();
-                matrix.setRotate(degree, (float) bitmap.getWidth() / 2, (float) bitmap.getHeight() / 2);
+                                    uploadImage(newImage_string, edt_image_name.getText().toString());
+                                }
+                            }).show();
 
-                Bitmap tmpBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-                if (bitmap != tmpBitmap) {
-                    bitmap.recycle();
-                    bitmap = tmpBitmap;
-                }
-
-                im_array.add(bitmap);
+                } catch (Exception e) {e.printStackTrace();}
             }
-            imageAdapter.notifyDataSetChanged();
         }
+        return;
+    }
+
+    public void uploadImage (String newImage_string, String image_name){
+        new JSONTaskUpload().execute("http://192.249.19.254:8180/imagePost", newImage_string, image_name);
+    }
+
+    public class JSONTaskUpload extends AsyncTask<String, String, Void> {
+
+        @Override
+        protected Void doInBackground(String... parms) {
+            try{
+                Bitmap newImage = StringToBitmap(parms[1]);
+                String image_name = parms[2]+".png"+"$"+username;
+                FileOutputStream fileOutStream = null;
+                DataOutputStream outputStream = null;
+                InputStream inputStream = null;
+                String boundary = "*****";
+                int bytesRead, bytesAvailable, bufferSize;
+                byte[] buffer;
+                byte[] decodedByteArray = Base64.decode(parms[1], Base64.NO_WRAP);
+
+                File outputFile = new File(tab2.getCacheDir(), image_name);
+                fileOutStream = new FileOutputStream(outputFile);
+                fileOutStream.write(decodedByteArray);
+                fileOutStream.flush();
+                fileOutStream.close();
+
+                FileInputStream fileInputStream = new FileInputStream(outputFile);
+
+                HttpURLConnection con = null;
+                BufferedReader reader = null;
+
+                try{
+                    URL url = new URL(parms[0]);
+                    con = (HttpURLConnection) url.openConnection();
+                    con.setRequestMethod("POST");
+                    con.setRequestProperty("Cache-Control", "no-cache");
+                    con.setDoOutput(true);
+                    con.setDoInput(true);
+                    con.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
+                    con.setRequestProperty("Connection", "Keep-Alive");
+                    con.setRequestProperty("User-Agent", "Android Multipart HTTP Client 1.0");
+                    con.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
+                    outputStream = new DataOutputStream(con.getOutputStream());
+
+                    outputStream.writeBytes("--" + boundary + "\r\n");
+                    outputStream.writeBytes("Content-Disposition: form-data; name=\"" + "file" + "\"; filename=\"" + image_name + "\"" + "\r\n");
+                    outputStream.writeBytes("Content-Type: image/png" + "\r\n");
+                    outputStream.writeBytes("Content-Transfer-Encoding: binary" + "\r\n");
+                    outputStream.writeBytes("\r\n");
+                    bytesAvailable = fileInputStream.available();
+                    bufferSize = Math.min(bytesAvailable, 1048576);
+                    buffer = new byte[bufferSize];
+                    bytesRead = fileInputStream.read(buffer, 0, bufferSize);
+                    while (bytesRead > 0) {
+                        outputStream.write(buffer, 0, bufferSize);
+                        bytesAvailable = fileInputStream.available();
+                        bufferSize = Math.min(bytesAvailable, 1048576);
+                        bytesRead = fileInputStream.read(buffer, 0, bufferSize);
+                    }
+
+                    outputStream.writeBytes("\r\n");
+                    outputStream.writeBytes("--" + boundary + "--" + "\r\n");
+
+                    inputStream = con.getInputStream();
+                    int status = con.getResponseCode();
+                    if (status == HttpURLConnection.HTTP_OK) {
+                        BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+                        String inputLine;
+                        StringBuffer response = new StringBuffer();
+
+                        while ((inputLine = in.readLine()) != null)
+                            response.append(inputLine);
+                        inputStream.close();
+                        con.disconnect();
+                        fileInputStream.close();
+                        outputStream.flush();
+                        outputStream.close();
+                    }
+                    con.disconnect();
+                    outputStream.flush();
+                    outputStream.close();
+
+
+
+                } catch(Exception e){ e.printStackTrace(); }
+
+            } catch(Exception e){ e.printStackTrace(); }
+
+            return null;
+        }
+
+
     }
 
     private Bitmap StringToBitmap(String string) {
@@ -283,4 +352,7 @@ public class tab2 extends Fragment {
         byte [] bytes = byteArrayOutputStream.toByteArray();
         return Base64.encodeToString(bytes, Base64.DEFAULT);
     }
+
+
+
 }
