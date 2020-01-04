@@ -19,9 +19,9 @@ public class SubActivity extends AppCompatActivity {
     private TabItem tab1, tab2, tab3;
     public PagerAdapter pagerAdapter;
     static ArrayList<Bitmap> im_array;
+    public static String username = "han";
 
     public static final String SP_NAME = "image_sf";
-    public static SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,8 +37,6 @@ public class SubActivity extends AppCompatActivity {
         pagerAdapter = new PageAdapter(getSupportFragmentManager(), tablayout.getTabCount());
         viewPager.setAdapter(pagerAdapter);
 
-        sharedPreferences = getSharedPreferences(SP_NAME, Context.MODE_PRIVATE);
-        im_array = new ArrayList<>();
 
 
         tablayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {

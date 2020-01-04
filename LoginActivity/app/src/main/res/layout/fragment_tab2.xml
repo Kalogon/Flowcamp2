@@ -18,24 +18,26 @@
         android:background="#E0FFFF">
     </GridView>
 
-    <Button
-        android:id="@+id/g_button"
-        android:layout_width="64dp"
-        android:layout_height="60dp"
-        android:layout_gravity="right|top" />
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/Btn_camera"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="16dp"
+        android:backgroundTint="#ffffff"
+        android:elevation="16dp" />
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/Btn_refresh"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:layout_margin="16dp"
+        android:elevation="16dp"
+        android:backgroundTint="#ffffff" />
 
-    <Button
-        android:id="@+id/d_button"
-        android:layout_width="72dp"
-        android:layout_height="70dp"
-        android:layout_gravity="right|bottom" />
-
-    <Button
-        android:id="@+id/s_button"
-        android:layout_width="71dp"
-        android:layout_height="73dp"
-        android:layout_gravity="left|bottom"
-        android:text="save"
-        android:textSize="20dp" />
 
 </FrameLayout>
