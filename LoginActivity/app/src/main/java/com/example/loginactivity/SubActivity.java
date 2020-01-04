@@ -38,7 +38,7 @@ public class SubActivity extends AppCompatActivity {
     private TabItem tab1, tab2, tab3;
     public PagerAdapter pagerAdapter;
     static ArrayList<Bitmap> im_array;
-
+    public static boolean first=false;
     public static final String SP_NAME = "image_sf";
     public static SharedPreferences sharedPreferences;
     public static JSONObject user;
@@ -55,6 +55,7 @@ public class SubActivity extends AppCompatActivity {
                 finish();
             }
         });
+
         TabLayout tablayout = findViewById(R.id.tablayout);
         tab1 = findViewById(R.id.Tab1);
         tab2 = findViewById(R.id.Tab2);
@@ -71,7 +72,13 @@ public class SubActivity extends AppCompatActivity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
+        JSONArray check = new JSONArray();
+        try {
+            check=new JSONArray(user.getString("friends"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        first=(check.length()==0);
         pagerAdapter = new PageAdapter(getSupportFragmentManager(), tablayout.getTabCount());
         viewPager.setAdapter(pagerAdapter);
 
