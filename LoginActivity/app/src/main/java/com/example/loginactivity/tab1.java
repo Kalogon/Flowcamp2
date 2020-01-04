@@ -65,34 +65,21 @@ public class tab1 extends Fragment {
     private View v;
     TextView tvData;
     JSONObject user;
-    private String id=SubActivity.user_id;
-    Context tab1;
-    private String name=SubActivity.user_name;
-
-    public tab1() {
-        // Required empty public constructor
-    }
+    /*private String id=SubActivity.user_id;*/
+    static Context tab1;
+    /*private String name=SubActivity.user_name;*/
+    static List<A_DATA> datas = new ArrayList<>();
+    static RecyclerView rv;
+    String userid="";
 
     private void start() throws JSONException {
-        RecyclerView rv = v.findViewById(R.id.contact);
+        rv= v.findViewById(R.id.contact);
         user=SubActivity.user;
-        List<A_DATA> datas = new ArrayList<>();
         JSONArray temp = new JSONArray();
+        datas = new ArrayList<>();
+        userid = user.getString("userid");
         temp=new JSONArray(user.getString("friends"));
-        if(temp.length()!=0){
-            for(int i=0;i<temp.length();i++){
-                String element1=temp.getJSONObject(i).getString("friend");
-                String element2=temp.getJSONObject(i).getString("phonenumber");
-                A_DATA data = new A_DATA(1, element1, element2, null);
-                datas.add(data);
-            }
-            mAdapter my_adapter = new mAdapter(getContext(), datas);
-
-            rv.setAdapter(my_adapter);
-            rv.setLayoutManager(new LinearLayoutManager(getContext()));
-        }
-        else{
-
+        if(temp.length()==0){
 
             JSONObject jsonObject_user = new JSONObject();
             JSONArray jsonarray=new JSONArray();
@@ -129,17 +116,27 @@ public class tab1 extends Fragment {
             }
             cursor.close();
 
-            mAdapter my_adapter = new mAdapter(getContext(), datas);
-
-            rv.setAdapter(my_adapter);
-            rv.setLayoutManager(new LinearLayoutManager(getContext()));
-
             new JSONTask(jsonObject_user,jsonarray).execute("http://192.249.19.254:7180/phonePost");
-
-
+        }
+        else{
+            convey(userid);
         }
         System.out.println(datas);
     }
+
+    public static void convey(String id_User){
+        new JSONTaskView(id_User).execute("http://192.249.19.254:7180/view");
+    }
+
+    public static void viewPhone(JSONArray friends) throws JSONException {
+        for(int i=0;i<friends.length();i++){
+            String element1=friends.getJSONObject(i).getString("friend");
+            String element2=friends.getJSONObject(i).getString("phonenumber");
+            A_DATA data = new A_DATA(1, element1, element2, null);
+            datas.add(data);
+        }
+    }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -182,9 +179,18 @@ public class tab1 extends Fragment {
                                     Toast.makeText(getActivity(), "number cannot be empty", Toast.LENGTH_SHORT).show();
                                     return;
                                 }
-
-                                addcontact(edt_register_name.getText().toString(),
-                                        edt_register_number.getText().toString());
+                                String temtem="";
+                                try {
+                                    temtem=user.getString("userid");
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                                try {
+                                    addcontact(edt_register_name.getText().toString(),
+                                            edt_register_number.getText().toString(),temtem);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
 
                             }
                         }).show();
@@ -192,7 +198,6 @@ public class tab1 extends Fragment {
 
             }
         });
-
 
 
         ArrayList<String> permissions = new ArrayList<>();
@@ -222,94 +227,13 @@ public class tab1 extends Fragment {
     }
 
 
-    public void addcontact (String name_edt, String number_edt){
-        new JSONTaskAddcontact().execute("http://192.249.19.254:7180/addcontact",  name_edt, number_edt);
+    public void addcontact (String name_edt, String number_edt,String temp) throws JSONException {
+        JSONObject addcontact=new JSONObject();
+        addcontact.accumulate("user_id",temp);
+        addcontact.accumulate("friend_name",name_edt);
+        addcontact.accumulate("friend_number",number_edt);
+        new JSONTaskAddcontact(addcontact).execute("http://192.249.19.254:7180/addcontact",  name_edt, number_edt);
     }
-
-
-    public class JSONTaskAddcontact extends AsyncTask<String, String, String> {
-
-        @Override
-        protected String doInBackground(String... parms) {
-            try {
-                //JSONObject를 만들고 key value 형식으로 값을 저장해준다.
-                JSONObject jsonObject = new JSONObject();
-                String name = parms[1];
-                String number= parms[2];
-                jsonObject.accumulate("email", name);
-                jsonObject.accumulate("password", number);
-
-                HttpURLConnection con = null;
-                BufferedReader reader = null;
-
-                try {
-                    URL url = new URL(parms[0]);                                     //url을 가져온다.
-                    con = (HttpURLConnection) url.openConnection();
-                    con.setRequestMethod("POST");//POST방식으로 보냄
-                    con.setRequestProperty("Cache-Control", "no-cache");            //캐시 설정
-                    con.setRequestProperty("Content-Type", "application/json");     //application JSON 형식으로 전송
-
-                    con.setRequestProperty("Accept", "text/html");                  //서버에 response 데이터를 html로 받음
-                    con.setDoOutput(true);                                          //Outstream으로 post 데이터를 넘겨주겠다는 의미
-                    con.setDoInput(true);                                           //Inputstream으로 서버로부터 응답을 받겠다는 의미
-
-                    con.connect();          //연결 수행
-
-                    //서버로 보내기위해서 스트림 만듬
-                    OutputStream outStream = con.getOutputStream();
-                    //버퍼를 생성하고 넣음
-                    BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outStream));
-                    writer.write(jsonObject.toString());
-                    writer.flush();
-                    writer.close();//버퍼를 받아줌
-
-
-                    //입력 스트림 생성
-                    InputStream stream = con.getInputStream();
-                    reader = new BufferedReader(new InputStreamReader(stream));    //속도를 향상시키고 부하를 줄이기 위한 버퍼를 선언한다
-                    StringBuffer buffer = new StringBuffer();                      //실제 데이터를 받는곳
-
-                    //line별 스트링을 받기 위한 temp 변수
-                    String line = "";
-                    while ((line = reader.readLine()) != null) {
-                        buffer.append(line);
-                    }
-
-                    return buffer.toString();
-
-                    //아래는 예외처리 부분이다.
-                } catch (MalformedURLException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } finally {
-                    //종료가 되면 disconnect메소드를 호출한다.
-                    if (con != null) {
-                        con.disconnect();
-                    }
-                    try {
-                        //버퍼를 닫아준다.
-                        if (reader != null) {
-                            reader.close();
-                        }
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }//finally 부분
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            return null;
-        }
-        @Override
-        protected void onPostExecute(String result) {
-            super.onPostExecute(result);
-            //tvData.setText(result);
-            Toast.makeText(getActivity(), ""+result, Toast.LENGTH_SHORT).show();
-        }
-    }
-
 
 
 
@@ -332,88 +256,6 @@ public class tab1 extends Fragment {
         }
     }
 
-
-    public class JSONTask extends AsyncTask<String, String, String>{
-        JSONObject jsonObject_user = new JSONObject();
-        JSONArray jsonarray = new JSONArray();
-        public JSONTask(JSONObject jsonObject_user, JSONArray jsonarray){
-            this.jsonarray=jsonarray;
-            this.jsonObject_user=jsonObject_user;
-        }
-        @Override
-        protected String doInBackground(String... urls) {
-            try {
-                //JSONObject를 만들고 key value 형식으로 값을 저장해준다.
-
-                HttpURLConnection con = null;
-                BufferedReader reader = null;
-
-                try{
-                    URL url = new URL(urls[0]);
-                    //연결을 함
-                    con = (HttpURLConnection) url.openConnection();
-
-                    con.setRequestMethod("POST");//POST방식으로 보냄
-                    con.setRequestProperty("Cache-Control", "no-cache");//캐시 설정
-                    con.setRequestProperty("Content-Type", "application/json");//application JSON 형식으로 전송
-
-
-                    con.setRequestProperty("Accept", "text/html");//서버에 response 데이터를 html로 받음
-                    con.setDoOutput(true);//Outstream으로 post 데이터를 넘겨주겠다는 의미
-                    con.setDoInput(true);//Inputstream으로 서버로부터 응답을 받겠다는 의미
-                    con.connect();
-
-                    //서버로 보내기위해서 스트림 만듬
-                    OutputStream outStream = con.getOutputStream();
-                    //버퍼를 생성하고 넣음
-                    BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outStream));
-                    /*writer.write(jsonObject_each.toString());*/
-                    writer.write(jsonarray.toString());
-                    writer.flush();
-                    writer.close();//버퍼를 받아줌
-
-                    //서버로 부터 데이터를 받음
-                    InputStream stream = con.getInputStream();
-
-                    reader = new BufferedReader(new InputStreamReader(stream));
-
-                    StringBuffer buffer = new StringBuffer();
-
-                    String line = "";
-                    while((line = reader.readLine()) != null){
-                        buffer.append(line);
-                    }
-
-                    return buffer.toString();//서버로 부터 받은 값을 리턴해줌 아마 OK!!가 들어올것임
-
-                } catch (MalformedURLException e){
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } finally {
-                    if(con != null){
-                        con.disconnect();
-                    }
-                    try {
-                        if(reader != null){
-                            reader.close();//버퍼를 닫아줌
-                        }
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            super.onPostExecute(result);
-        }
-    }
 
 }
 

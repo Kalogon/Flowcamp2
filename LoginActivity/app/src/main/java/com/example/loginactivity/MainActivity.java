@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -64,13 +65,10 @@ public class MainActivity extends AppCompatActivity {
         btn_custom_login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getApplicationContext(),SubActivity.class);
-                startActivity(intent);
-
-//                LoginManager loginManager = LoginManager.getInstance();
-//                loginManager.logInWithReadPermissions(MainActivity.this,
-//                        Arrays.asList("public_profile", "email"));
-//                loginManager.registerCallback(mCallbackManager, mLoginCallback);
+               LoginManager loginManager = LoginManager.getInstance();
+               loginManager.logInWithReadPermissions(MainActivity.this,
+                      Arrays.asList("public_profile", "email"));
+               loginManager.registerCallback(mCallbackManager, mLoginCallback);
             }
         });
 
