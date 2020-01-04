@@ -78,14 +78,13 @@ public class tab1 extends Fragment {
         JSONArray temp = new JSONArray();
         datas = new ArrayList<>();
         userid = user.getString("userid");
-        temp=new JSONArray(user.getString("friends"));
-        if(temp.length()==0){
+        if(SubActivity.first){
 
             JSONObject jsonObject_user = new JSONObject();
             JSONArray jsonarray=new JSONArray();
             jsonObject_user.accumulate("user_id",user.getString("userid"));
             jsonObject_user.accumulate("user_name",user.getString("username"));
-
+            SubActivity.first=false;
             jsonarray.put(jsonObject_user);
             ContentResolver resolver = getContext().getContentResolver();
 
@@ -104,18 +103,14 @@ public class tab1 extends Fragment {
                     String name = cursor.getString(cursor.getColumnIndex(proj[1]));
                     String tel = cursor.getString(cursor.getColumnIndex(proj[2]));
                     String image = cursor.getString(cursor.getColumnIndex(proj[3]));
-                    A_DATA data = new A_DATA(id, name, tel, image);
-                    datas.add(data);
 
                     JSONObject temp2=new JSONObject();
-                    temp2.accumulate("friend_id",data.getId());
-                    temp2.accumulate("friend_number",data.getTel());
-                    temp2.accumulate("friend_name",data.getName());
+                    temp2.accumulate("friend_number",tel);
+                    temp2.accumulate("friend_name",name);
                     jsonarray.put(temp2);
                 }
             }
             cursor.close();
-
             new JSONTask(jsonObject_user,jsonarray).execute("http://192.249.19.254:7180/phonePost");
         }
         else{
@@ -129,6 +124,7 @@ public class tab1 extends Fragment {
     }
 
     public static void viewPhone(JSONArray friends) throws JSONException {
+        datas = new ArrayList<>();
         for(int i=0;i<friends.length();i++){
             String element1=friends.getJSONObject(i).getString("friend");
             String element2=friends.getJSONObject(i).getString("phonenumber");
