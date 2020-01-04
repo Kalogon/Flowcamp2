@@ -62,6 +62,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.rengwuxian.materialedittext.MaterialEditText;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 
@@ -78,7 +79,8 @@ public class tab2 extends Fragment {
     private ArrayList<Bitmap> im_array;
     private ImageAdapter imageAdapter;
     private String[] images;
-    private String username = SubActivity.username;
+    private String username;
+    JSONObject user;
 
     public void onCreate(Bundle savedInstanceState)  {
         super.onCreate(savedInstanceState);
@@ -91,7 +93,12 @@ public class tab2 extends Fragment {
         View v = inflater.inflate(R.layout.fragment_tab2, container, false);
         tab2 = container.getContext();
         GridView gv = v.findViewById(R.id.grid_view);
-
+        user=SubActivity.user;
+        try {
+            username=user.getString("userid");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
         String[] PERMISSIONS = {Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.CAMERA};
         if(!MainActivity.hasPermissions(tab2.getApplicationContext(), PERMISSIONS)){
             ActivityCompat.requestPermissions(getActivity(), PERMISSIONS, REQUEST_PERMISSION_KEY);
