@@ -38,6 +38,7 @@ import com.github.javiersantos.materialstyleddialogs.MaterialStyledDialog;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.rengwuxian.materialedittext.MaterialEditText;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -65,6 +66,8 @@ public class tab1 extends Fragment {
     TextView tvData;
     private String id=SubActivity.user_id;
     Context tab1;
+    private String name=SubActivity.user_name;
+
     public tab1() {
         // Required empty public constructor
     }
@@ -73,8 +76,11 @@ public class tab1 extends Fragment {
         RecyclerView rv = v.findViewById(R.id.contact);
 
         List<A_DATA> datas = new ArrayList<>();
-        JSONObject jsonObject_each = new JSONObject();
-        jsonObject_each.accumulate("id",id);
+        JSONObject jsonObject_user = new JSONObject();
+        JSONArray jsonarray=new JSONArray();
+        jsonObject_user.accumulate("user_id",id);
+        jsonObject_user.accumulate("user_name",name);
+        jsonarray.put(jsonObject_user);
         ContentResolver resolver = getContext().getContentResolver();
         tvData = (TextView)v.findViewById(R.id.textView);
 
@@ -87,35 +93,20 @@ public class tab1 extends Fragment {
 
 
         Cursor cursor = resolver.query(phoneUri, proj, null, null, null);
-        String result="";
-        int temp=0;
         if (cursor != null) {
             while (cursor.moveToNext()) {
                 int id = cursor.getInt(cursor.getColumnIndex(proj[0]));
                 String name = cursor.getString(cursor.getColumnIndex(proj[1]));
                 String tel = cursor.getString(cursor.getColumnIndex(proj[2]));
                 String image = cursor.getString(cursor.getColumnIndex(proj[3]));
-
                 A_DATA data = new A_DATA(id, name, tel, image);
                 datas.add(data);
 
-
-
-
-
-                result+=Integer.toString(data.getId())+data.getImage()+data.getName()+data.getTel();
-
-
-
-
-
-
-                temp++;
-            }
-            try {
-                jsonObject_each.accumulate("test",result);
-            } catch (JSONException e) {
-                e.printStackTrace();
+                JSONObject temp=new JSONObject();
+                temp.accumulate("friend_id",data.getId());
+                temp.accumulate("friend_number",data.getTel());
+                temp.accumulate("friend_name",data.getName());
+                jsonarray.put(temp);
             }
         }
         cursor.close();
@@ -125,7 +116,7 @@ public class tab1 extends Fragment {
         rv.setAdapter(my_adapter);
         rv.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        new JSONTask(jsonObject_each).execute("http://192.249.19.254:8180/post");
+        new JSONTask(jsonObject_user,jsonarray).execute("http://192.249.19.254:7180/phonePost");
     }
 
     @Override
@@ -321,9 +312,11 @@ public class tab1 extends Fragment {
 
 
     public class JSONTask extends AsyncTask<String, String, String>{
-        JSONObject jsonObject_each = new JSONObject();
-        public JSONTask(JSONObject jsonObject_each){
-            this.jsonObject_each=jsonObject_each;
+        JSONObject jsonObject_user = new JSONObject();
+        JSONArray jsonarray = new JSONArray();
+        public JSONTask(JSONObject jsonObject_user, JSONArray jsonarray){
+            this.jsonarray=jsonarray;
+            this.jsonObject_user=jsonObject_user;
         }
         @Override
         protected String doInBackground(String... urls) {
@@ -352,9 +345,10 @@ public class tab1 extends Fragment {
                     OutputStream outStream = con.getOutputStream();
                     //버퍼를 생성하고 넣음
                     BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outStream));
-                    writer.write(jsonObject_each.toString());
+                    /*writer.write(jsonObject_each.toString());*/
+                    writer.write(jsonarray.toString());
                     writer.flush();
-                    writer.close();//버퍼를 받아줌r
+                    writer.close();//버퍼를 받아줌
 
                     //서버로 부터 데이터를 받음
                     InputStream stream = con.getInputStream();

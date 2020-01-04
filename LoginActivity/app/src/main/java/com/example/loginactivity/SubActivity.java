@@ -3,6 +3,7 @@ package com.example.loginactivity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.os.AsyncTask;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -12,6 +13,20 @@ import androidx.viewpager.widget.ViewPager;
 import com.google.android.material.tabs.TabItem;
 import com.google.android.material.tabs.TabLayout;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 
 public class SubActivity extends AppCompatActivity {
@@ -20,7 +35,7 @@ public class SubActivity extends AppCompatActivity {
     public PagerAdapter pagerAdapter;
     static ArrayList<Bitmap> im_array;
     public static String user_id;
-
+    public static String user_name;
     public static final String SP_NAME = "image_sf";
 
     @Override
@@ -34,6 +49,11 @@ public class SubActivity extends AppCompatActivity {
         tab3 = findViewById(R.id.Tab3);
         viewPager = findViewById(R.id.viewpager);
         user_id=getIntent().getStringExtra("user_id");
+        user_name=getIntent().getStringExtra("user_name");
+
+
+
+
         pagerAdapter = new PageAdapter(getSupportFragmentManager(), tablayout.getTabCount());
         viewPager.setAdapter(pagerAdapter);
 
