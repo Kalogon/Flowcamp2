@@ -25,15 +25,4 @@
         android:elevation="16dp"
         android:src="@drawable/plus"/>
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/Btn_delcon"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:layout_margin="16dp"
-        android:elevation="16dp"
-        android:backgroundTint="#ffffff"
-        android:src="@drawable/minus"/>
 </FrameLayout>

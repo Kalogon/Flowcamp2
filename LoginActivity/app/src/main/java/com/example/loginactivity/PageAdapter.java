@@ -10,7 +10,6 @@ public class PageAdapter extends FragmentPagerAdapter {
 
     private int numoftabs;
     private boolean acting = false;
-    private tab3 third;
 
     public PageAdapter(FragmentManager fm, int numOfTabs) {
         super(fm);
@@ -25,11 +24,13 @@ public class PageAdapter extends FragmentPagerAdapter {
             case 1:
                 return new tab2();
             case 2:
-                if (!acting) {
-                    third = new tab3();
-                    acting = true;
-                }
-                return third;
+                return new tab3();
+            case 3:
+                return new tab4();
+            case 4:
+                return new tab5();
+
+
 
         }
         return null;

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="major">
+        <item>가정교육과</item>
+        <item>교육학과</item>
+        <item>국어교육과</item>
+        <item>기술교육과</item>
+        <item>독어교육과</item>
+        <item>물리교육과</item>
+        <item>미술교육과</item>
+        <item>생물교육과</item>
+        <item>수학교육과</item>
+        <item>역사교육과</item>
+
+    </string-array>
+    <string-array name="year">
+        <item>2016년도</item>
+        <item>2018년도</item>
+        <item>2019년도</item>
+        <item>2020년도</item>
+        <item>2021년도</item>
+        <item>2022년도</item>
+        <item>2023년도</item>
+        <item>2024년도</item>
+        <item>2025년도</item>
+
+    </string-array>
+
+    <string-array name="term">
+        <item>1학기</item>
+        <item>여름학기</item>
+        <item>2학기</item>
+        <item>겨울학기</item>
+    </string-array>
+
+    <string-array name="graduateArea">
+        <item>교육학과공통</item>
+        <item>선수</item>
+        <item>전공</item>
+    </string-array>
+
+    <string-array name="universityArea">
+        <item>교양및기타</item>
+        <item>전공</item>
+    </string-array>
+    <string-array name="universityRefinementMajor">
+        <item>군사학</item>
+        <item>교직이론</item>
+        <item>교직소양</item>
+        <item>청람비전</item>
+
+
+    </string-array>
+    <string-array name="universityMajor">
+        <item>유아교육과</item>
+        <item>초등교육과</item>
+        <item>고등교육과</item>
+        <item>국어교육과</item>
+        <item>영어교육과</item>
+    </string-array>
+
+    <string-array name="graduateMajor">
+        <item>교육학공통</item>
+        <item>교육학과</item>
+        <item>교육행정</item>
+        <item>교육심리</item>
+
+
+
+    </string-array>
+
+
+
+</resources>
