@@ -158,7 +158,7 @@ public class tab3 extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         v = inflater.inflate(R.layout.fragment_tab3, container, false);
-
+        user = SubActivity.user;
         try {
             userid=user.getString("userid");
         } catch (JSONException e) {

@@ -52,7 +52,7 @@ public class JSONTaskCourse extends AsyncTask<String, String, String> {
                 //버퍼를 생성하고 넣음
                 BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outStream));
                 /*writer.write(jsonObject_each.toString());*/
-                writer.write(jsonarray.toString());
+                writer.write(findcourse.toString());
                 writer.flush();
                 writer.close();//버퍼를 받아줌
 
@@ -96,6 +96,6 @@ public class JSONTaskCourse extends AsyncTask<String, String, String> {
     @Override
     protected void onPostExecute(String result) {
         super.onPostExecute(result);
-        tab1.convey(result);
+
     }
 }

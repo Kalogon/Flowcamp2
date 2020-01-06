@@ -45,14 +45,6 @@ public class mAdapter extends RecyclerView.Adapter<mAdapter.ViewHolder> {
         new JSONTaskdel(delcontact).execute("http://192.249.19.254:7180/delcontact",  name_edt, number_edt);
     }
 
-    public void delcontact (String name_edt, String number_edt,String temp) throws JSONException {
-        JSONObject delcontact=new JSONObject();
-        delcontact.accumulate("user_id",temp);
-        delcontact.accumulate("friend_name",name_edt);
-        delcontact.accumulate("friend_number",number_edt);
-        new JSONTaskdel(delcontact).execute("http://192.249.19.254:7180/delcontact",  name_edt, number_edt);
-    }
-
     public class ViewHolder extends RecyclerView.ViewHolder {
         public TextView texttel;
         public TextView textname;
