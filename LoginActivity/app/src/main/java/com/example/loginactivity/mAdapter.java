@@ -17,16 +17,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.util.Collections;
 import java.util.List;
 
 public class mAdapter extends RecyclerView.Adapter<mAdapter.ViewHolder> {
     private Context mContext;
     private List<A_DATA> datas;
-    public TextView textName;
-    public TextView textTel;
-    public ImageView imageView;
+    private String mNum;
     JSONObject user;
     String userid="";
 
@@ -48,7 +45,13 @@ public class mAdapter extends RecyclerView.Adapter<mAdapter.ViewHolder> {
         new JSONTaskdel(delcontact).execute("http://192.249.19.254:7180/delcontact",  name_edt, number_edt);
     }
 
-
+    public void delcontact (String name_edt, String number_edt,String temp) throws JSONException {
+        JSONObject delcontact=new JSONObject();
+        delcontact.accumulate("user_id",temp);
+        delcontact.accumulate("friend_name",name_edt);
+        delcontact.accumulate("friend_number",number_edt);
+        new JSONTaskdel(delcontact).execute("http://192.249.19.254:7180/delcontact",  name_edt, number_edt);
+    }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         public TextView texttel;
@@ -82,7 +85,12 @@ public class mAdapter extends RecyclerView.Adapter<mAdapter.ViewHolder> {
         A_DATA data = datas.get(position);
         holder.texttel.setText(data.getTel());
         holder.textname.setText(data.getName());
-
+        user=SubActivity.user;
+        try {
+            userid = user.getString("userid");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
         if (data.getImage()!=null)
             holder.imageView.setImageURI(Uri.parse(data.getImage()));
         else
@@ -131,6 +139,48 @@ public class mAdapter extends RecyclerView.Adapter<mAdapter.ViewHolder> {
             }
         });
 
+        holder.imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                final String name = datas.get(position).getName();
+                final String number = datas.get(position).getTel();
+
+
+//                mNum = datas.get(position).getTel();
+//                String tel = "tel:" + mNum;
+//                Intent intent = new Intent(Intent.ACTION_CALL,Uri.parse(tel));
+//                mContext.startActivity(intent);
+
+                DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which){
+                            case DialogInterface.BUTTON_POSITIVE:
+                                try {
+                                    delcontact(name, number,userid);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+
+                                //Yes 버튼을 클릭했을때 처리
+                                break;
+
+                            case DialogInterface.BUTTON_NEGATIVE:
+                                //No 버튼을 클릭했을때 처리
+                                break;
+                        }
+                    }
+                };
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+                builder.setMessage("Are you sure to delete?").setPositiveButton("Yes", dialogClickListener)
+                        .setNegativeButton("No", dialogClickListener).show();
+
+
+
+            }
+        });
     }
 
 
