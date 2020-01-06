@@ -2,7 +2,9 @@ package com.example.loginactivity;
 
 import android.os.AsyncTask;
 
-import org.json.JSONArray;
+import androidx.recyclerview.widget.LinearLayoutManager;
+
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -16,11 +18,10 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class JSONTaskdel extends AsyncTask<String, String, String> {
-    JSONObject delcontact;
-    JSONArray jsonarray = new JSONArray();
-    public JSONTaskdel(JSONObject delcontact){
-        this.delcontact=delcontact;
+public class JSONTaskuploadimage extends AsyncTask<String, String, String> {
+    JSONObject uploadimage;
+    public JSONTaskuploadimage(JSONObject uploadimage){
+        this.uploadimage=uploadimage;
     }
     @Override
     protected String doInBackground(String... parms) {
@@ -47,7 +48,7 @@ public class JSONTaskdel extends AsyncTask<String, String, String> {
                 OutputStream outStream = con.getOutputStream();
                 //버퍼를 생성하고 넣음
                 BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outStream));
-                writer.write(delcontact.toString());
+                writer.write(uploadimage.toString());
                 writer.flush();
                 writer.close();//버퍼를 받아줌
 
@@ -90,9 +91,9 @@ public class JSONTaskdel extends AsyncTask<String, String, String> {
 
         return null;
     }
-    @Override
-    protected void onPostExecute(String result) {
-        super.onPostExecute(result);
-        tab1.convey(result);
-    }
+//   @Override
+//    protected void onPostExecute(String result) {
+//        super.onPostExecute(result);
+//        tab1.convey(result);
+//    }
 }

@@ -3,6 +3,7 @@ package com.example.loginactivity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.util.Base64;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +14,7 @@ import android.widget.ImageView;
 import java.util.ArrayList;
 
 public class ImageAdapter extends BaseAdapter {
+
 
     private Context mContext;
     private ArrayList<Bitmap> imageArray;
@@ -46,4 +48,6 @@ public class ImageAdapter extends BaseAdapter {
 
         return imageView;
     }
+
 }
+

@@ -24,6 +24,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.provider.ContactsContract;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -142,8 +143,6 @@ public class tab1 extends Fragment {
         tab1 = container.getContext();
 
         FloatingActionButton btnadd = (FloatingActionButton) v.findViewById(R.id.Btn_addcon);
-        FloatingActionButton btndel = (FloatingActionButton) v.findViewById(R.id.Btn_delcon);
-
 
         btnadd.setOnClickListener(new View.OnClickListener() {
             @Override

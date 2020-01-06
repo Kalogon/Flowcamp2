@@ -69,6 +69,7 @@ import java.util.ArrayList;
 public class tab2 extends Fragment {
     static final int REQUEST_PERMISSION_KEY = 1;
     static Context tab2;
+
     GridView galleryGridView;
     private String[] images;
     View view;
@@ -103,7 +104,6 @@ public class tab2 extends Fragment {
         }
 
 
-        /*new JSONTaskUrl().execute("http://192.249.19.254:7180/urlsGet", userid);*/
 
         //////////////////////////////////////take photo////////////////////////////////////////////
         FloatingActionButton btnCamera = (FloatingActionButton) view.findViewById(R.id.Btn_camera);
@@ -118,6 +118,7 @@ public class tab2 extends Fragment {
 
 
         new JSONTaskGetImages(userid).execute("http://192.249.19.254:7180/getImages");
+
         ////////////////////////////////////////btn refresh/////////////////////////////////////////
         FloatingActionButton btnRefresh = (FloatingActionButton) view.findViewById(R.id.Btn_refresh);
         btnRefresh.setOnClickListener(new View.OnClickListener(){
@@ -131,6 +132,45 @@ public class tab2 extends Fragment {
         });
         ////////////////////////////////////////////////////////////////////////////////////////////
 
+        return view;
+    }
+
+
+    //after take photo, set name and upload it to server
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(resultCode!=0) {
+            if (requestCode == 1 && !data.equals(null)) {
+                try {
+                    final Bitmap newImage = (Bitmap) data.getExtras().get("data");
+                    final View layout_camera = LayoutInflater.from(tab2).inflate(R.layout.layout_camera, null);
+                    new MaterialStyledDialog.Builder(tab2)
+                            .setIcon(R.drawable.ic_launcher_foreground)
+                            .setTitle("Add Image to server")
+                            .setCustomView(layout_camera)
+                            .setNegativeText("CANCEL")
+                            .onNegative(new MaterialDialog.SingleButtonCallback() {
+                                @Override
+                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                    dialog.dismiss();
+                                }
+                            })
+                            .setPositiveText("ADD")
+                            .onPositive(new MaterialDialog.SingleButtonCallback() {
+                                @Override
+                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                    MaterialEditText edt_image_name = (MaterialEditText) layout_camera.findViewById(R.id.edit_image);
+
+                                    if(TextUtils.isEmpty(edt_image_name.getText().toString())){
+                                        Toast.makeText(tab2, "Please set image name", Toast.LENGTH_SHORT).show();
+                                        return;
+                                    }
+                                    String newImage_string = encodeBase64String(newImage);
+
+                                    uploadImage(newImage_string, edt_image_name.getText().toString());
+                                }
+                            }).show();
 
         return view;
     }
@@ -371,6 +411,14 @@ public class tab2 extends Fragment {
         }
 
     }
+
+    public Bitmap decodeBase64String(String base64) {
+        byte[] decodedByteArray = Base64.decode(base64, Base64.NO_WRAP);
+        Bitmap decodedBitmap = BitmapFactory.decodeByteArray(decodedByteArray, 0, decodedByteArray.length);
+        return decodedBitmap;
+    }
+
+
 
 
 
