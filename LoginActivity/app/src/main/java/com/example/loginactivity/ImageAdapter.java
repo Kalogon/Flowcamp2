@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
+import android.util.Base64;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -46,7 +47,7 @@ public class ImageAdapter extends BaseAdapter {
             imageView = (ImageView)convertView;
         } else {
             try {
-                final Bitmap bitmap = new JSONTaskGetImage().execute("http://192.249.19.254:8180/imageGet", path).get();
+                final Bitmap bitmap = new JSONTaskGetImage().execute("http://192.249.19.254:7180/imageGet", path).get();
 
                 imageView = new ImageView(context);
                 imageView.setAdjustViewBounds(true);
@@ -118,4 +119,5 @@ public class ImageAdapter extends BaseAdapter {
         }
 
     }
+
 }
