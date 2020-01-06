@@ -1,10 +1,8 @@
 package com.example.loginactivity;
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.os.AsyncTask;
 import android.util.Base64;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,112 +10,40 @@ import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 
 public class ImageAdapter extends BaseAdapter {
 
-    Context context = null;
-    String[] images = null;
-    ImageView imageView;
-    int imageID = 0;
+    private Context mContext;
+    private ArrayList<Bitmap> imageArray;
 
-    public ImageAdapter(Context context, String[] images){
-        this.context = context;
-        this.images = images;
+
+    public ImageAdapter(Context mContext, ArrayList<Bitmap> list){
+        this.mContext = mContext;
+        imageArray = list;
     }
 
-    public int getCount() { return (null != images) ? images.length : 0; }
-    public Object getItem(int position) { return (null != images) ? images[position] : 0; }
-    public long getItemId(int position) { return position; }
 
-    public View getView(final int position, View convertView, ViewGroup parent){
+    @Override
+    public int getCount() {return imageArray.size();}
 
-        final String path = images[position];
+    @Override
+    public Object getItem(int position) {return imageArray.get(position);}
 
-        if(convertView != null){
-            imageView = (ImageView)convertView;
-        } else {
-            try {
-                final Bitmap bitmap = new JSONTaskGetImage().execute("http://192.249.19.254:7180/imageGet", path).get();
+    @Override
+    public long getItemId(int position) {
+        return 0;
+    }
 
-                imageView = new ImageView(context);
-                imageView.setAdjustViewBounds(true);
-                imageView.setImageBitmap(bitmap);
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
 
-                imageView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view){
-                        Intent intent = new Intent(context, make_full.class);
-                        intent.putExtra("image", bitmap);
-                        context.startActivity(intent);
-                    }
-                });
+        ImageView imageView = new ImageView(mContext);
+        imageView.setImageBitmap(imageArray.get(position));
+        imageView.setScaleType((ImageView.ScaleType.CENTER_CROP));
+        imageView.setLayoutParams(new GridView.LayoutParams(340,350));
 
-            } catch(Exception e){
-                e.printStackTrace();
-            }
-        }
 
         return imageView;
     }
-
-    public class JSONTaskGetImage extends AsyncTask<String, String, Bitmap> {
-
-        @Override
-        protected Bitmap doInBackground(String... parms) {
-            try{
-                JSONObject jsonObject = new JSONObject();
-                String imageURL = parms[1];
-                jsonObject.accumulate("imageURL", imageURL);
-
-                HttpURLConnection con = null;
-                BufferedReader reader = null;
-
-                try{
-                    URL url = new URL(parms[0]);
-                    con = (HttpURLConnection) url.openConnection();
-                    con.setRequestMethod("POST");
-                    con.setRequestProperty("Cache-Control", "no-cache");
-                    con.setRequestProperty("Content-Type", "application/json");
-                    con.setRequestProperty("Accept", "text/html");
-                    con.setDoOutput(true);
-                    con.setDoInput(true);
-
-                    con.connect();
-
-                    OutputStream outStream = con.getOutputStream();
-                    BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outStream));
-                    writer.write(jsonObject.toString());
-                    writer.flush();
-                    writer.close();
-
-                    InputStream stream = con.getInputStream();
-                    Bitmap image = BitmapFactory.decodeStream(stream);
-                    Bitmap imageR = Bitmap.createScaledBitmap(image, 320, 240, false);
-                    return imageR;
-
-                } catch (Exception e){
-                    e.printStackTrace();
-                } finally{
-                    if (con != null)
-                        con.disconnect();
-                }
-
-            } catch(Exception e){ e.printStackTrace(); }
-
-            return null;
-
-        }
-
-    }
-
 }

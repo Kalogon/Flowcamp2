@@ -26,6 +26,7 @@ import androidx.fragment.app.Fragment;
 import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Base64;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,6 +45,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
@@ -66,20 +68,27 @@ import java.util.ArrayList;
  */
 public class tab2 extends Fragment {
     static final int REQUEST_PERMISSION_KEY = 1;
-    Context tab2;
+    static Context tab2;
     GridView galleryGridView;
     private String[] images;
     View view;
     String userid="";
     JSONObject user;
+    Bitmap bitmap;
+    static ArrayList<Bitmap> im_array = new ArrayList<>();
+    static GridView gv;
+    private static ImageAdapter imageAdapter;
 
     public void onCreate(Bundle savedInstanceState)  {
         super.onCreate(savedInstanceState);
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_tab2, container, false);
+        tab2 = container.getContext();
+        gv = view.findViewById(R.id.grid_view);
         tab2 = container.getContext();
         user=SubActivity.user;
         try {
@@ -94,7 +103,7 @@ public class tab2 extends Fragment {
         }
 
 
-        new JSONTaskUrl().execute("http://192.249.19.254:7180/urlsGet", userid);
+        /*new JSONTaskUrl().execute("http://192.249.19.254:7180/urlsGet", userid);*/
 
         //////////////////////////////////////take photo////////////////////////////////////////////
         FloatingActionButton btnCamera = (FloatingActionButton) view.findViewById(R.id.Btn_camera);
@@ -108,16 +117,20 @@ public class tab2 extends Fragment {
         ////////////////////////////////////////////////////////////////////////////////////////////
 
 
-
+        new JSONTaskGetImages(userid).execute("http://192.249.19.254:7180/getImages");
         ////////////////////////////////////////btn refresh/////////////////////////////////////////
         FloatingActionButton btnRefresh = (FloatingActionButton) view.findViewById(R.id.Btn_refresh);
         btnRefresh.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
-                new JSONTaskUrl().execute("http://192.249.19.254:7180/urlsGet", userid);
+                String photoname= "1.png";
+                /*bitmap= getImagefromURL("http://192.249.19.254:7180/test");
+                System.out.println(1);*/
+                new JSONTaskGetImages(userid).execute("http://192.249.19.254:7180/getImages");
             }
         });
         ////////////////////////////////////////////////////////////////////////////////////////////
+
 
         return view;
     }
@@ -165,93 +178,36 @@ public class tab2 extends Fragment {
         return;
     }
 
-    public class JSONTaskUrl extends AsyncTask<String, String, String> {
 
-        @Override
-        protected String doInBackground(String... parms) {
-            try{
-
-                JSONObject jsonObject = new JSONObject();
-                String userid = parms[1];
-                jsonObject.accumulate("userid", userid);
-
-                HttpURLConnection con = null;
-                BufferedReader reader = null;
-
-                try{
-                    URL url = new URL(parms[0]);
-                    con = (HttpURLConnection) url.openConnection();
-                    con.setRequestMethod("POST");
-                    con.setRequestProperty("Cache-Control", "no-cache");
-                    con.setRequestProperty("Content-Type", "application/json");
-
-                    con.setRequestProperty("Accept", "text/html");
-                    con.setDoOutput(true);
-                    con.setDoInput(true);
-                    con.connect();
-
-                    OutputStream outStream = con.getOutputStream();
-                    BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outStream));
-                    writer.write(jsonObject.toString());
-                    writer.flush();
-                    writer.close();
-
-                    InputStream stream = con.getInputStream();
-                    reader = new BufferedReader(new InputStreamReader(stream));
-                    StringBuffer buffer = new StringBuffer();
-                    String line = "";
-                    while((line = reader.readLine()) != null)
-                        buffer.append(line);
-
-
-                    return buffer.toString();
-                } catch (Exception e){
-                    e.printStackTrace();
-                } finally{
-                    if (con != null)
-                        con.disconnect();
-                    try {
-                        if(reader != null)
-                            reader.close();
-                    } catch (IOException e) { e.printStackTrace(); }
-                }
-            } catch(Exception e){ e.printStackTrace(); }
-
-            return null;
-        }
-
-//        @Override
-//        protected void onPostExecute(String result) {
-//            super.onPostExecute(result);
-//
-//            if (result.equals("\"No images\"")){
-//                return;
-//            }else{
-//                try{
-//                    JSONObject jsonObject = new JSONObject(result);
-//                    JSONArray jsonArray = jsonObject.getJSONArray("image_urls");
-//
-//                    images = new String[jsonArray.length()];
-//                    for(int i=0; i<jsonArray.length(); i++)
-//                        images[i] = jsonArray.get(i).toString();
-//
-//                    galleryGridView = (GridView) view.findViewById(R.id.grid_view);
-//                    ImageAdapter adapter = new ImageAdapter(tab2, images);
-//                    galleryGridView.setAdapter(adapter);
-//
-//                }catch (Exception e){ e.printStackTrace(); }
-//
-//            }
-//        }
-
+    public void uploadImage (String newImage_string, String image_name){
+        new JSONTaskUpload(userid).execute("http://192.249.19.254:7180/imagePost", newImage_string, image_name);
+        new JSONTaskDbsave(userid, image_name).execute("http://192.249.19.254:7180/dbsave");
     }
 
 
-    public void uploadImage (String newImage_string, String image_name){
-        new JSONTaskUpload().execute("http://192.249.19.254:7180/imagePost", newImage_string, image_name);
+
+
+    ////////////////////////////////////////////////////////////////
+    ///////////          Helper Functions             //////////////
+    ////////////////////////////////////////////////////////////////
+    public String encodeBase64String(Bitmap bitmap) {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
+        byte[] imageBytes = byteArrayOutputStream.toByteArray();
+        return Base64.encodeToString(imageBytes, Base64.NO_WRAP);
+    }
+
+    public static Bitmap decodeBase64String(String base64) {
+        byte[] decodedByteArray = Base64.decode(base64, Base64.NO_WRAP);
+        Bitmap decodedBitmap = BitmapFactory.decodeByteArray(decodedByteArray, 0, decodedByteArray.length);
+        return decodedBitmap;
     }
 
     public class JSONTaskUpload extends AsyncTask<String, String, Void> {
+        String userid;
+        public JSONTaskUpload(String userid) {
+            this.userid=userid;
+        }
 
         @Override
         protected Void doInBackground(String... parms) {
@@ -334,31 +290,87 @@ public class tab2 extends Fragment {
 
             } catch(Exception e){ e.printStackTrace(); }
 
+
+            return null;
+        }
+    }
+
+
+
+
+    static class JSONTaskUrl extends AsyncTask<String, String, String> {
+        JSONArray images=new JSONArray();
+        public JSONTaskUrl(JSONArray images) {
+            this.images = images;
+        }
+
+        @Override
+        protected String doInBackground(String... parms) {
+            try{
+
+                JSONObject jsonObject = new JSONObject();
+                String userid = parms[1];
+                String photoname = parms[2];
+                jsonObject.accumulate("user_id", userid);
+                jsonObject.accumulate("photo_name", photoname);
+                HttpURLConnection con = null;
+                BufferedReader reader = null;
+
+                try{
+                    URL url = new URL(parms[0]);
+                    con = (HttpURLConnection) url.openConnection();
+                    con.setRequestMethod("POST");
+                    con.setRequestProperty("Cache-Control", "no-cache");
+                    con.setRequestProperty("Content-Type", "application/json");
+
+                    con.setRequestProperty("Accept", "text/html");
+                    con.setDoOutput(true);
+                    con.setDoInput(true);
+                    con.connect();
+
+                    OutputStream outStream = con.getOutputStream();
+                    BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outStream));
+                    writer.write(jsonObject.toString());
+                    writer.flush();
+                    writer.close();
+
+                    InputStream stream = con.getInputStream();
+                    im_array.add(BitmapFactory.decodeStream(stream));
+                    /* reader = new BufferedReader(new InputStreamReader(stream));*/
+                    StringBuffer buffer = new StringBuffer();
+                    /*String line = "";
+                    while((line = reader.readLine()) != null)
+                        buffer.append(line);*/
+
+
+                    return buffer.toString();
+                } catch (Exception e){
+                    e.printStackTrace();
+                } finally{
+                    if (con != null)
+                        con.disconnect();
+                    try {
+                        if(reader != null)
+                            reader.close();
+                    } catch (IOException e) { e.printStackTrace(); }
+                }
+            } catch(Exception e){ e.printStackTrace(); }
+
             return null;
         }
 
 
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+            if(images.length() == im_array.size()){
+                imageAdapter = new ImageAdapter(tab2, im_array);
+                gv.setAdapter(imageAdapter);
+                im_array = new ArrayList<>();
+            }
+
+        }
+
     }
-
-
-
-    ////////////////////////////////////////////////////////////////
-    ///////////          Helper Functions             //////////////
-    ////////////////////////////////////////////////////////////////
-    public String encodeBase64String(Bitmap bitmap) {
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
-        byte[] imageBytes = byteArrayOutputStream.toByteArray();
-        return Base64.encodeToString(imageBytes, Base64.NO_WRAP);
-    }
-
-    public Bitmap decodeBase64String(String base64) {
-        byte[] decodedByteArray = Base64.decode(base64, Base64.NO_WRAP);
-        Bitmap decodedBitmap = BitmapFactory.decodeByteArray(decodedByteArray, 0, decodedByteArray.length);
-        return decodedBitmap;
-    }
-
-
 
 
 
