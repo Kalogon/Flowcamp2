@@ -1,5 +1,7 @@
 package com.example.loginactivity;
 
+import android.widget.TextView;
+
 public class A_DATA {
     private int id;
     private String name;

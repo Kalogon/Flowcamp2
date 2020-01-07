@@ -16,12 +16,12 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class JSONTaskCourse extends AsyncTask<String, String, String> {
-    JSONObject findcourse;
+public class JSONTaskAddschedule extends AsyncTask<String, String, String> {
+    JSONObject addschedule;
     JSONObject jsonObject_user = new JSONObject();
     JSONArray jsonarray = new JSONArray();
-    public JSONTaskCourse(JSONObject findcourse){
-        this.findcourse=findcourse;
+    public JSONTaskAddschedule(JSONObject addschedule){
+        this.addschedule=addschedule;
 
     }
     @Override
@@ -52,7 +52,7 @@ public class JSONTaskCourse extends AsyncTask<String, String, String> {
                 //버퍼를 생성하고 넣음
                 BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outStream));
                 /*writer.write(jsonObject_each.toString());*/
-                writer.write(findcourse.toString());
+                writer.write(addschedule.toString());
                 writer.flush();
                 writer.close();//버퍼를 받아줌
 
@@ -96,6 +96,7 @@ public class JSONTaskCourse extends AsyncTask<String, String, String> {
     @Override
     protected void onPostExecute(String result) {
         super.onPostExecute(result);
-
+        //schedule.addSchedule(courseTime,courseTitle,courseProfessor); //while돌려서 다 가져오게 하는 듯하다...
+        //schedule.setting(monday,tuesday,wednesday,thrusday,friday,getContext());
     }
 }
