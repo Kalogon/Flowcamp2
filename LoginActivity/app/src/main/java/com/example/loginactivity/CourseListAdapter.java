@@ -96,139 +96,18 @@ public class CourseListAdapter extends BaseAdapter {
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                boolean validate = false;
-//                validate = schedule.validate(courseList.get(i).getCourseTime());
-//                user = SubActivity.user;
-//                if (!alreadyIn(courseIDList, courseList.get(i).getCourseID())) {  //이미 신청한 강의 인지 검증
-//                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
-//                    AlertDialog dialog = builder.setMessage("이미 추가한 강의입니다.")
-//                            .setPositiveButton("다시 시도", null)
-//                            .create();
-//                    dialog.show();
-//
-//                }else if (validate == false) {  //유효성채크(SCHEDUEL 클래스에서 채크)  이미
-//                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
-//                    AlertDialog dialog = builder.setMessage("시간표가 중복 됩니다.")
-//                            .setPositiveButton("다시 시도", null)
-//                            .create();
-//                    dialog.show();
-//                }else{
-//
-//                    //addcourse코드
-//                    //(성공시)
-//                    courseIDlist.add(courseList.get(i).getCourseID());
-//                    schedule.addSchedule(courseList.get(i).getCourseTime());
-//
-//
-//                }
-//
-//
-//                try {
-//                    userid = user.getString("userid");
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                }
-//                //중복 및 유효성 채크
-//                try {
-//                    addcourse(courseList.get(i).getCourseID()+ "",userid);  //사용자 아이디과 강의 아이디를 서버측에 보내서 특정 사용자가 특정수업을 들었다를 저장
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                }
-
-                //서버측에서 리스폰스로 성공 및 실패에 대한 정보를 return
-//                boolean success =
-//                if()
-
-
-
-                //validate = schedule.validate(courseList.get(i).getCourseTime()); //유효성 채크
-//                if (!alreadyIn(courseIDList, courseList.get(i).getCourseID())) {  //중복채크
-//                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
-//                    AlertDialog dialog = builder.setMessage("강의가 추가 되었습니다..")
-//                            .setPositiveButton("확인", null)
-//                            .create();
-//                    dialog.show();
-//
-//                } else if (validate == false) {  //유효성채크(SCHEDUEL 클래스에서 채크)
-//                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
-//                    AlertDialog dialog = builder.setMessage("강의 추가에 실패 했습니다.")
-//                            .setPositiveButton("다시 시도", null)
-//                            .create();
-//                    dialog.show();
-//                }
-
-
-//                addRequest = new AddRequest(userid, courseList.get(i).getCourseID() + "" ,responseListener);  //데이터의 스케쥴데이터를 스케쥴 큐 에 넣어준다.
-//                RequestQueue queue = Volley.newRequestQueue(context);
-//                queue.add(addRequest);
-
-
-            }
-
-
-
-                ///////////////////////////////////수업시간표 체크/////////////////////////////////////////////
-
-//                boolean validate = false;
-//                validate = schedule.validate(courseList.get(i).getCourseTime());
-//                if(!alreadyln(courseIDList,courseList.get(i).getCourseID())){
-//                    AlertDialog.Builder builder = new AlertDialog.Builder(mContext,getActivity());
-//                    AlertDialog dialog = builder.setMessage("이미 추가한 강의 입니다.")
-//                            .setPositiveButton("확인",null)
-//                            .create();
-//                    dialog.show();
-//
-//                }
-//                else if(validate==false){
-//                    AlertDialog.Builder builder = new AlertDialog.Builder(mContext,getActivity());
-//                    AlertDialog dialog = builder.setMessage("시간표가 중복됩니다.")
-//                            .setPositiveButton("다시 시도",null)
-//                            .create();
-//                    dialog.show();
-//
-//                }else{
-//
-//                    //서버의 회신을 받는다.
-                ////////////성공시/////////////////////////////
-                // courseIDList.add(courseList.get(i).getCourseID());
-                //schedule.addSchedule(courseList.get(i).getCourseTime());
-                ///////////////////////////////////////////////////////
-//
-//                }
-
-                /////////////////////////////////////////////////////////////////////////////////////////////////////
-//                user=SubActivity.user;
-//                try {
-//                    userid = user.getString("userid");
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                }
 
                 String courseid = String.valueOf(courseList.get(i).getCourseID());
                 String courseTime = courseList.get(i).getCourseTime();
                 try {
-                    addcourse(courseTime, courseid,userid);
+                    addcourse(courseTime, courseid, userid);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-
-
-                //////////////////디아로그로 가의 추가 실패 성공 추가 에정지//////////////////////////////////
-
-
-
-
-
-
-
-
-                ////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-
-            });
-            return v;
-        }
+            }
+        });
+        return v;
+    }
 
 
 
@@ -246,7 +125,7 @@ public class CourseListAdapter extends BaseAdapter {
         addcourse.accumulate("user_id",temp);
         addcourse.accumulate("course_id", courseid);
         addcourse.accumulate("course_time", coursetime);
-        new JSONTaskaddCourse(addcourse).execute("http://192.249.19.254:7180/addcourse", courseid );
+        new JSONTaskAddcourse(addcourse).execute("http://192.249.19.254:7180/addcourse", courseid );
 
     }
 
