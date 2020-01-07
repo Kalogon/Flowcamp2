@@ -33,7 +33,8 @@ public class CourseListAdapter extends BaseAdapter {
         schedule = new Schedule();
         courseIDList = new ArrayList<Integer>();
         //checkschedule(userid); //background task
-
+        user=SubActivity.user;
+        userid = user.getString("userid");
     }
 
 

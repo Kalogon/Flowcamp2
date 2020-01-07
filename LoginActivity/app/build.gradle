@@ -41,5 +41,6 @@ dependencies {
     implementation 'com.rengwuxian.materialedittext:library:2.1.4'
 
     implementation 'com.github.javiersantos:MaterialStyledDialogs:2.1'
+    implementation 'com.github.jivimberg:autoresizetextview:0.0.2'
 
 }
