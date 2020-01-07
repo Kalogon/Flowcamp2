@@ -2,7 +2,10 @@ package com.example.loginactivity;
 
 import android.os.AsyncTask;
 
+import androidx.recyclerview.widget.LinearLayoutManager;
+
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -96,6 +99,19 @@ public class JSONTaskCourse extends AsyncTask<String, String, String> {
     @Override
     protected void onPostExecute(String result) {
         super.onPostExecute(result);
+        JSONArray courses=new JSONArray();
+        try {
+            courses=new JSONArray(result);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        try {
+            tab3.viewCourse(courses);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        CourseListAdapter my_adapter = new CourseListAdapter(tab3.tab3, tab3.courses);
 
+        tab3.cv.setAdapter(my_adapter);
     }
 }
