@@ -10,7 +10,8 @@
         android:id="@+id/contact"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scrollbars="vertical" />
+        android:scrollbars="vertical"
+        android:background="@color/azure"/>
 
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton

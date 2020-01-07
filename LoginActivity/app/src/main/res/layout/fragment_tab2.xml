@@ -15,7 +15,7 @@
         android:verticalSpacing="20dp"
         android:gravity="center"
         android:stretchMode="columnWidth"
-        android:background="#E0FFFF">
+        android:background="@color/azure">
     </GridView>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton

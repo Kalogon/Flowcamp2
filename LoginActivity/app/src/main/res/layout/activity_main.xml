@@ -12,15 +12,18 @@
 
     android:gravity="center"
 
-    tools:context="com.example.loginactivity.MainActivity">
+    tools:context="com.example.loginactivity.MainActivity"
+
+    android:background="@drawable/faceback">
 
 
     <Button
         android:id="@+id/btn_custom_login"
-        android:layout_width="wrap_content"
+        android:layout_width="216dp"
         android:layout_height="wrap_content"
-        android:text="페이스북으로 로그인" />
-
+        android:layout_gravity="bottom"
+        android:layout_marginBottom="50dp"
+        android:background="@drawable/facebook_login_1" />
 
 
 </LinearLayout>

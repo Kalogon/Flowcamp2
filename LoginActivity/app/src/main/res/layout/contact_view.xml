@@ -11,7 +11,7 @@
         card:cardCornerRadius="10dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        card:cardBackgroundColor="#FAFAD2">
+        card:cardBackgroundColor="@color/dodger_blue">
 
         <LinearLayout
             android:layout_width="match_parent"
