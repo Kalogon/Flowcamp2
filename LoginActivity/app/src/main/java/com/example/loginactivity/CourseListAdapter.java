@@ -96,6 +96,7 @@ public class CourseListAdapter extends BaseAdapter {
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 String courseid = String.valueOf(courseList.get(i).getCourseID());
                 String courseTime = courseList.get(i).getCourseTime();
                 try {
@@ -103,23 +104,12 @@ public class CourseListAdapter extends BaseAdapter {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-
             }
         });
         return v;
     }
 
-
-
-
-    public boolean alreadyIn(List<Integer>courseIDList,int item){
-        for(int i = 0;i<courseIDList.size();i++){
-            if(courseIDList.get(i)==item){   //모든 강의아아디 리스트를 돌면서 추가하려는 강의가 이미 있다면 false값을 주도록한다.
-                return false;
-            }
-        }
-        return true;
-    }
+    
     public void addcourse (String coursetime, String courseid, String temp) throws JSONException {
         JSONObject addcourse=new JSONObject();
         addcourse.accumulate("user_id",temp);
