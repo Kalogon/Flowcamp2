@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -44,10 +45,12 @@ public class SubActivity extends AppCompatActivity {
         setContentView(R.layout.tab_main);
         context = getApplicationContext();
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
         Toolbar tb = findViewById(R.id.toolbar);
         setSupportActionBar(tb);
         getSupportActionBar().setDisplayShowCustomEnabled(true);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
+
 
         TabLayout tablayout = findViewById(R.id.tablayout);
         tab1 = findViewById(R.id.Tab1);
