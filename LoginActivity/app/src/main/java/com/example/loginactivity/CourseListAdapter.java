@@ -204,9 +204,14 @@ public class CourseListAdapter extends BaseAdapter {
 //                    e.printStackTrace();
 //                }
 
-//                String courseid = URLEncoder.encode(courseList.get(i).getCourseID());
-//
-//                addcourse();//강의 추가
+                String courseid = String.valueOf(courseList.get(i).getCourseID());
+                String courseTime = courseList.get(i).getCourseTime();
+                try {
+                    addcourse(courseTime, courseid,userid);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
 
                 //////////////////디아로그로 가의 추가 실패 성공 추가 에정지//////////////////////////////////
 
@@ -236,13 +241,13 @@ public class CourseListAdapter extends BaseAdapter {
         }
         return true;
     }
-
-    public void addcourse (String courseid,String temp) throws JSONException {
+    public void addcourse (String coursetime, String courseid, String temp) throws JSONException {
         JSONObject addcourse=new JSONObject();
         addcourse.accumulate("user_id",temp);
         addcourse.accumulate("course_id", courseid);
+        addcourse.accumulate("course_time", coursetime);
+        new JSONTaskaddCourse(addcourse).execute("http://192.249.19.254:7180/addcourse", courseid );
 
-        new JSONTaskCourse(addcourse).execute("http://192.249.19.254:7180/addcourse", courseid );
     }
 
 //    public void checkschedule (String temp) throws JSONException {

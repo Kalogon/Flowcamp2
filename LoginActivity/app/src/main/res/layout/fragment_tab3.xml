@@ -20,14 +20,14 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="학부"
+            android:text="undergraduate"
             android:id="@+id/university"/>
 
         <RadioButton
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="대학원"
+            android:text="graduate"
             android:id="@+id/graduate"/>
 
 
