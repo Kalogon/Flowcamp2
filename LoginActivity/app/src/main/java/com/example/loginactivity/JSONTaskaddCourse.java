@@ -1,10 +1,8 @@
 package com.example.loginactivity;
 
 import android.os.AsyncTask;
-import android.widget.Toast;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -18,11 +16,11 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class JSONTaskaddCourse extends AsyncTask<String, String, String> {
+public class JSONTaskAddcourse extends AsyncTask<String, String, String> {
     JSONObject addcourse;
     JSONObject jsonObject_user = new JSONObject();
     JSONArray jsonarray = new JSONArray();
-    public JSONTaskaddCourse(JSONObject addcourse){
+    public JSONTaskAddcourse (JSONObject addcourse){
         this.addcourse=addcourse;
 
     }
@@ -98,11 +96,7 @@ public class JSONTaskaddCourse extends AsyncTask<String, String, String> {
     @Override
     protected void onPostExecute(String result) {
         super.onPostExecute(result);
-        if(result.equals("OK")) {
-            Toast.makeText(SubActivity.context, "시간표에 성공적으로 추가되었습니다.", Toast.LENGTH_SHORT).show();
-        }
-        else{
-            Toast.makeText(SubActivity.context,"망했습니다.",Toast.LENGTH_SHORT).show();
-        }
+        //schedule.addSchedule(courseTime,courseTitle,courseProfessor); //while돌려서 다 가져오게 하는 듯하다...
+        //schedule.setting(monday,tuesday,wednesday,thrusday,friday,getContext());
     }
 }

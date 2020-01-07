@@ -110,7 +110,12 @@ public class JSONTaskCourse extends AsyncTask<String, String, String> {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        CourseListAdapter my_adapter = new CourseListAdapter(tab3.tab3, tab3.courses);
+        CourseListAdapter my_adapter = null;
+        try {
+            my_adapter = new CourseListAdapter(tab3.tab3, tab3.courses);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
         tab3.cv.setAdapter(my_adapter);
     }
