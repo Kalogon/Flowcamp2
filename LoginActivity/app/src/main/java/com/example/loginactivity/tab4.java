@@ -3,6 +3,7 @@ package com.example.loginactivity;
 
 import androidx.fragment.app.Fragment;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -30,7 +31,7 @@ import java.util.List;
 
 
 public class tab4 extends Fragment {
-
+    static Context tab4;
     View v;
     String userid="";
     JSONObject user;
@@ -45,17 +46,23 @@ public class tab4 extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        user=SubActivity.user;
+        try {
+            userid = user.getString("userid");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
     }
 
-    private AutoResizeTextView monday[] = new AutoResizeTextView[14];
-    private AutoResizeTextView tuesday[] = new AutoResizeTextView[14];
-    private AutoResizeTextView wednesday[] = new AutoResizeTextView[14];
-    private AutoResizeTextView thursday[] = new AutoResizeTextView[14];
-    private AutoResizeTextView friday[] = new AutoResizeTextView[14];
-    public Schedule schedule = new Schedule();
+    public static TextView[] monday = new TextView[14];
+    public static TextView[] tuesday = new TextView[14];
+    public static TextView[] wednesday = new TextView[14];
+    public static TextView[] thursday = new TextView[14];
+    public static TextView[] friday = new TextView[14];
+    public static Schedule schedule = new Schedule();
 
-    public void showschedule (String temp) throws JSONException {
+    public static void showschedule(String temp) throws JSONException {
         JSONObject showschedule=new JSONObject();
         showschedule.accumulate("user_id",temp);
 
@@ -67,76 +74,76 @@ public class tab4 extends Fragment {
     @Override
     public void onActivityCreated(Bundle b) {  //초기화
         super.onActivityCreated(b);
-        monday[0] = (AutoResizeTextView) getView().findViewById(R.id.monday0);
-        monday[1] = (AutoResizeTextView) getView().findViewById(R.id.monday1);
-        monday[2] = (AutoResizeTextView) getView().findViewById(R.id.monday2);
-        monday[3] = (AutoResizeTextView) getView().findViewById(R.id.monday3);
-        monday[4] = (AutoResizeTextView) getView().findViewById(R.id.monday4);
-        monday[5] = (AutoResizeTextView) getView().findViewById(R.id.monday5);
-        monday[6] = (AutoResizeTextView) getView().findViewById(R.id.monday6);
-        monday[7] = (AutoResizeTextView) getView().findViewById(R.id.monday7);
-        monday[8] = (AutoResizeTextView) getView().findViewById(R.id.monday8);
-        monday[9] = (AutoResizeTextView) getView().findViewById(R.id.monday9);
-        monday[10] = (AutoResizeTextView) getView().findViewById(R.id.monday10);
-        monday[11] = (AutoResizeTextView) getView().findViewById(R.id.monday11);
-        monday[12] = (AutoResizeTextView) getView().findViewById(R.id.monday12);
-        monday[13] = (AutoResizeTextView) getView().findViewById(R.id.monday13);
-        tuesday[0] = (AutoResizeTextView) getView().findViewById(R.id.tuesday0);
-        tuesday[1] = (AutoResizeTextView) getView().findViewById(R.id.tuesday1);
-        tuesday[2] = (AutoResizeTextView) getView().findViewById(R.id.tuesday2);
-        tuesday[3] = (AutoResizeTextView) getView().findViewById(R.id.tuesday3);
-        tuesday[4] = (AutoResizeTextView) getView().findViewById(R.id.tuesday4);
-        tuesday[5] = (AutoResizeTextView) getView().findViewById(R.id.tuesday5);
-        tuesday[6] = (AutoResizeTextView) getView().findViewById(R.id.tuesday6);
-        tuesday[7] = (AutoResizeTextView) getView().findViewById(R.id.tuesday7);
-        tuesday[8] = (AutoResizeTextView) getView().findViewById(R.id.tuesday8);
-        tuesday[9] = (AutoResizeTextView) getView().findViewById(R.id.tuesday9);
-        tuesday[10] = (AutoResizeTextView) getView().findViewById(R.id.tuesday10);
-        tuesday[11] = (AutoResizeTextView) getView().findViewById(R.id.tuesday11);
-        tuesday[12] = (AutoResizeTextView) getView().findViewById(R.id.tuesday12);
-        tuesday[13] = (AutoResizeTextView) getView().findViewById(R.id.tuesday13);
-        wednesday[0] = (AutoResizeTextView) getView().findViewById(R.id.wednesday0);
-        wednesday[1] = (AutoResizeTextView) getView().findViewById(R.id.wednesday1);
-        wednesday[2] = (AutoResizeTextView) getView().findViewById(R.id.wednesday2);
-        wednesday[3] = (AutoResizeTextView) getView().findViewById(R.id.wednesday3);
-        wednesday[4] = (AutoResizeTextView) getView().findViewById(R.id.wednesday4);
-        wednesday[5] = (AutoResizeTextView) getView().findViewById(R.id.wednesday5);
-        wednesday[6] = (AutoResizeTextView) getView().findViewById(R.id.wednesday6);
-        wednesday[7] = (AutoResizeTextView) getView().findViewById(R.id.wednesday7);
-        wednesday[8] = (AutoResizeTextView) getView().findViewById(R.id.wednesday8);
-        wednesday[9] = (AutoResizeTextView) getView().findViewById(R.id.wednesday9);
-        wednesday[10] = (AutoResizeTextView) getView().findViewById(R.id.wednesday10);
-        wednesday[11] = (AutoResizeTextView) getView().findViewById(R.id.wednesday11);
-        wednesday[12] = (AutoResizeTextView) getView().findViewById(R.id.wednesday12);
-        wednesday[13] = (AutoResizeTextView) getView().findViewById(R.id.wednesday13);
-        thursday[0] = (AutoResizeTextView) getView().findViewById(R.id.thursday0);
-        thursday[1] = (AutoResizeTextView) getView().findViewById(R.id.thursday1);
-        thursday[2] = (AutoResizeTextView) getView().findViewById(R.id.thursday2);
-        thursday[3] = (AutoResizeTextView) getView().findViewById(R.id.thursday3);
-        thursday[4] = (AutoResizeTextView) getView().findViewById(R.id.thursday4);
-        thursday[5] = (AutoResizeTextView) getView().findViewById(R.id.thursday5);
-        thursday[6] = (AutoResizeTextView) getView().findViewById(R.id.thursday6);
-        thursday[7] = (AutoResizeTextView) getView().findViewById(R.id.thursday7);
-        thursday[8] = (AutoResizeTextView) getView().findViewById(R.id.thursday8);
-        thursday[9] = (AutoResizeTextView) getView().findViewById(R.id.thursday9);
-        thursday[10] = (AutoResizeTextView) getView().findViewById(R.id.thursday10);
-        thursday[11] = (AutoResizeTextView) getView().findViewById(R.id.thursday11);
-        thursday[12] = (AutoResizeTextView) getView().findViewById(R.id.thursday12);
-        thursday[13] = (AutoResizeTextView) getView().findViewById(R.id.thursday13);
-        friday[0] = (AutoResizeTextView) getView().findViewById(R.id.friday0);
-        friday[1] = (AutoResizeTextView) getView().findViewById(R.id.friday1);
-        friday[2] = (AutoResizeTextView) getView().findViewById(R.id.friday2);
-        friday[3] = (AutoResizeTextView) getView().findViewById(R.id.friday3);
-        friday[4] = (AutoResizeTextView) getView().findViewById(R.id.friday4);
-        friday[5] = (AutoResizeTextView) getView().findViewById(R.id.friday5);
-        friday[6] = (AutoResizeTextView) getView().findViewById(R.id.friday6);
-        friday[7] = (AutoResizeTextView) getView().findViewById(R.id.friday7);
-        friday[8] = (AutoResizeTextView) getView().findViewById(R.id.friday8);
-        friday[9] = (AutoResizeTextView) getView().findViewById(R.id.friday9);
-        friday[10] = (AutoResizeTextView) getView().findViewById(R.id.friday10);
-        friday[11] = (AutoResizeTextView) getView().findViewById(R.id.friday11);
-        friday[12] = (AutoResizeTextView) getView().findViewById(R.id.friday12);
-        friday[13] = (AutoResizeTextView) getView().findViewById(R.id.friday13);
+        monday[0] = (TextView) getView().findViewById(R.id.monday0);
+        monday[1] = (TextView) getView().findViewById(R.id.monday1);
+        monday[2] = (TextView) getView().findViewById(R.id.monday2);
+        monday[3] = (TextView) getView().findViewById(R.id.monday3);
+        monday[4] = (TextView) getView().findViewById(R.id.monday4);
+        monday[5] = (TextView) getView().findViewById(R.id.monday5);
+        monday[6] = (TextView) getView().findViewById(R.id.monday6);
+        monday[7] = (TextView) getView().findViewById(R.id.monday7);
+        monday[8] = (TextView) getView().findViewById(R.id.monday8);
+        monday[9] = (TextView) getView().findViewById(R.id.monday9);
+        monday[10] = (TextView) getView().findViewById(R.id.monday10);
+        monday[11] = (TextView) getView().findViewById(R.id.monday11);
+        monday[12] = (TextView) getView().findViewById(R.id.monday12);
+        monday[13] = (TextView) getView().findViewById(R.id.monday13);
+        tuesday[0] = (TextView) getView().findViewById(R.id.tuesday0);
+        tuesday[1] = (TextView) getView().findViewById(R.id.tuesday1);
+        tuesday[2] = (TextView) getView().findViewById(R.id.tuesday2);
+        tuesday[3] = (TextView) getView().findViewById(R.id.tuesday3);
+        tuesday[4] = (TextView) getView().findViewById(R.id.tuesday4);
+        tuesday[5] = (TextView) getView().findViewById(R.id.tuesday5);
+        tuesday[6] = (TextView) getView().findViewById(R.id.tuesday6);
+        tuesday[7] = (TextView) getView().findViewById(R.id.tuesday7);
+        tuesday[8] = (TextView) getView().findViewById(R.id.tuesday8);
+        tuesday[9] = (TextView) getView().findViewById(R.id.tuesday9);
+        tuesday[10] = (TextView) getView().findViewById(R.id.tuesday10);
+        tuesday[11] = (TextView) getView().findViewById(R.id.tuesday11);
+        tuesday[12] = (TextView) getView().findViewById(R.id.tuesday12);
+        tuesday[13] = (TextView) getView().findViewById(R.id.tuesday13);
+        wednesday[0] = (TextView) getView().findViewById(R.id.wednesday0);
+        wednesday[1] = (TextView) getView().findViewById(R.id.wednesday1);
+        wednesday[2] = (TextView) getView().findViewById(R.id.wednesday2);
+        wednesday[3] = (TextView) getView().findViewById(R.id.wednesday3);
+        wednesday[4] = (TextView) getView().findViewById(R.id.wednesday4);
+        wednesday[5] = (TextView) getView().findViewById(R.id.wednesday5);
+        wednesday[6] = (TextView) getView().findViewById(R.id.wednesday6);
+        wednesday[7] = (TextView) getView().findViewById(R.id.wednesday7);
+        wednesday[8] = (TextView) getView().findViewById(R.id.wednesday8);
+        wednesday[9] = (TextView) getView().findViewById(R.id.wednesday9);
+        wednesday[10] = (TextView) getView().findViewById(R.id.wednesday10);
+        wednesday[11] = (TextView) getView().findViewById(R.id.wednesday11);
+        wednesday[12] = (TextView) getView().findViewById(R.id.wednesday12);
+        wednesday[13] = (TextView) getView().findViewById(R.id.wednesday13);
+        thursday[0] = (TextView) getView().findViewById(R.id.thursday0);
+        thursday[1] = (TextView) getView().findViewById(R.id.thursday1);
+        thursday[2] = (TextView) getView().findViewById(R.id.thursday2);
+        thursday[3] = (TextView) getView().findViewById(R.id.thursday3);
+        thursday[4] = (TextView) getView().findViewById(R.id.thursday4);
+        thursday[5] = (TextView) getView().findViewById(R.id.thursday5);
+        thursday[6] = (TextView) getView().findViewById(R.id.thursday6);
+        thursday[7] = (TextView) getView().findViewById(R.id.thursday7);
+        thursday[8] = (TextView) getView().findViewById(R.id.thursday8);
+        thursday[9] = (TextView) getView().findViewById(R.id.thursday9);
+        thursday[10] = (TextView) getView().findViewById(R.id.thursday10);
+        thursday[11] = (TextView) getView().findViewById(R.id.thursday11);
+        thursday[12] = (TextView) getView().findViewById(R.id.thursday12);
+        thursday[13] = (TextView) getView().findViewById(R.id.thursday13);
+        friday[0] = (TextView) getView().findViewById(R.id.friday0);
+        friday[1] = (TextView) getView().findViewById(R.id.friday1);
+        friday[2] = (TextView) getView().findViewById(R.id.friday2);
+        friday[3] = (TextView) getView().findViewById(R.id.friday3);
+        friday[4] = (TextView) getView().findViewById(R.id.friday4);
+        friday[5] = (TextView) getView().findViewById(R.id.friday5);
+        friday[6] = (TextView) getView().findViewById(R.id.friday6);
+        friday[7] = (TextView) getView().findViewById(R.id.friday7);
+        friday[8] = (TextView) getView().findViewById(R.id.friday8);
+        friday[9] = (TextView) getView().findViewById(R.id.friday9);
+        friday[10] = (TextView) getView().findViewById(R.id.friday10);
+        friday[11] = (TextView) getView().findViewById(R.id.friday11);
+        friday[12] = (TextView) getView().findViewById(R.id.friday12);
+        friday[13] = (TextView) getView().findViewById(R.id.friday13);
 
         try {
             showschedule(userid);
@@ -147,7 +154,7 @@ public class tab4 extends Fragment {
 
 
 
-    public class JSONTaskSchedule extends AsyncTask<String, String, String> {
+    public static class JSONTaskSchedule extends AsyncTask<String, String, String> {
         JSONObject showschedule;
         private List<Course> courseList;
         JSONObject jsonObject_user = new JSONObject();
@@ -233,7 +240,7 @@ public class tab4 extends Fragment {
             String courseTime ="";
             String courseTitle = "";
             int courseID;
-
+            schedule = new Schedule();
             JSONArray schedules = new JSONArray();
             try {
                 schedules = new JSONArray(result);
@@ -251,7 +258,7 @@ public class tab4 extends Fragment {
 
 
                 try {
-                    courseID = object.getInt("courseID");
+                    courseID = object.getInt("courseId");
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -279,7 +286,7 @@ public class tab4 extends Fragment {
                 count++;
 
             }
-            schedule.setting(monday,tuesday,wednesday,thursday,friday,getContext());
+            schedule.setting(monday,tuesday,wednesday,thursday,friday,tab4);
 
         }
     }
@@ -294,6 +301,7 @@ public class tab4 extends Fragment {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+        tab4=container.getContext();
 
         return v;
     }

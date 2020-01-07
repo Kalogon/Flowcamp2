@@ -3,45 +3,59 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".tab5"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    tools:context="com.example.loginactivity.MainActivity"
+    android:background="@color/azure">
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:layout_marginTop="10dp"
         android:layout_gravity="center"
-        android:layout_marginTop="10dp">
-
+        android:gravity="center"
+        android:paddingRight="10dp">
 
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="230dp"
             android:layout_height="wrap_content"
-            android:text="등록한"
-            android:textColor="#000000"/>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="총 학점"
-            android:textColor="#000000"/>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="등록한"
-            android:textColor="#000000"/>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="등록한"
-            android:textColor="#000000"/>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="등록한"
-            android:textColor="#000000"/>
+            android:layout_gravity="center"
+            android:text="수강 조회 및 철회"
+            android:textColor="#000000"
+            android:textSize="20dp"
+            android:textStyle="bold"
+            android:layout_marginLeft="10dp"></TextView>
+
+        <Button
+            android:layout_width="80dp"
+            android:layout_height="40dp"
+            android:textSize="15dp"
+            android:textStyle="bold"
+            android:textColor="#ffffff"
+            android:background="@color/colorAccent"
+            android:id="@+id/searchButton"
+            android:text="강의 검색"
+            android:layout_marginLeft="10dp"/>
 
 
+    </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="10dp"
+        android:background="#ffffff">
+
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/courseListView"
+            android:dividerHeight="10dp"
+            android:divider="#ffffff"
+            android:padding="5dp"
+            >
+
+        </ListView>
     </LinearLayout>
 
 

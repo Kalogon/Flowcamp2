@@ -1,9 +1,11 @@
 package com.example.loginactivity;
 
 import android.os.AsyncTask;
-import android.widget.Toast;
+
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -17,12 +19,11 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class JSONTaskAddcourse extends AsyncTask<String, String, String> {
-    JSONObject addcourse;
+public class JSONTaskViewdelcourse extends AsyncTask<String, String, String> {
+    JSONObject getcourselist;
     JSONObject jsonObject_user = new JSONObject();
-    JSONArray jsonarray = new JSONArray();
-    public JSONTaskAddcourse (JSONObject addcourse){
-        this.addcourse=addcourse;
+    public JSONTaskViewdelcourse(JSONObject getcourselist){
+        this.getcourselist=getcourselist;
 
     }
     @Override
@@ -53,7 +54,7 @@ public class JSONTaskAddcourse extends AsyncTask<String, String, String> {
                 //버퍼를 생성하고 넣음
                 BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outStream));
                 /*writer.write(jsonObject_each.toString());*/
-                writer.write(addcourse.toString());
+                writer.write(getcourselist.toString());
                 writer.flush();
                 writer.close();//버퍼를 받아줌
 
@@ -97,13 +98,24 @@ public class JSONTaskAddcourse extends AsyncTask<String, String, String> {
     @Override
     protected void onPostExecute(String result) {
         super.onPostExecute(result);
-        if(result.equals("OK")) {
-            Toast.makeText(SubActivity.context, "시간표에 성공적으로 추가되었습니다.", Toast.LENGTH_SHORT).show();
+        JSONArray courses=new JSONArray();
+        try {
+            courses=new JSONArray(result);
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
-        else{
-            Toast.makeText(SubActivity.context,"망했습니다.",Toast.LENGTH_SHORT).show();
+        try {
+            tab5.viewCourse(courses);
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
-        //schedule.addSchedule(courseTime,courseTitle,courseProfessor); //while돌려서 다 가져오게 하는 듯하다...
-        //schedule.setting(monday,tuesday,wednesday,thrusday,friday,getContext());
+        DelcourseListAdapter my_adapter = null;
+        try {
+            my_adapter = new DelcourseListAdapter(tab5.tab5, tab5.delcourses);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+         tab5.cv.setAdapter(my_adapter);
     }
 }

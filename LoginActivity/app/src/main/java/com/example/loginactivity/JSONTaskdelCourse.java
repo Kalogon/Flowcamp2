@@ -4,6 +4,7 @@ import android.os.AsyncTask;
 import android.widget.Toast;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -17,12 +18,11 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class JSONTaskAddcourse extends AsyncTask<String, String, String> {
-    JSONObject addcourse;
+public class JSONTaskdelCourse extends AsyncTask<String, String, String> {
+    JSONObject delcourse;
     JSONObject jsonObject_user = new JSONObject();
-    JSONArray jsonarray = new JSONArray();
-    public JSONTaskAddcourse (JSONObject addcourse){
-        this.addcourse=addcourse;
+    public JSONTaskdelCourse(JSONObject delcourse){
+        this.delcourse=delcourse;
 
     }
     @Override
@@ -53,7 +53,7 @@ public class JSONTaskAddcourse extends AsyncTask<String, String, String> {
                 //버퍼를 생성하고 넣음
                 BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outStream));
                 /*writer.write(jsonObject_each.toString());*/
-                writer.write(addcourse.toString());
+                writer.write(delcourse.toString());
                 writer.flush();
                 writer.close();//버퍼를 받아줌
 
@@ -98,12 +98,21 @@ public class JSONTaskAddcourse extends AsyncTask<String, String, String> {
     protected void onPostExecute(String result) {
         super.onPostExecute(result);
         if(result.equals("OK")) {
-            Toast.makeText(SubActivity.context, "시간표에 성공적으로 추가되었습니다.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(SubActivity.context, "삭제 되었습니다.", Toast.LENGTH_SHORT).show();
         }
         else{
             Toast.makeText(SubActivity.context,"망했습니다.",Toast.LENGTH_SHORT).show();
         }
-        //schedule.addSchedule(courseTime,courseTitle,courseProfessor); //while돌려서 다 가져오게 하는 듯하다...
-        //schedule.setting(monday,tuesday,wednesday,thrusday,friday,getContext());
+        try {
+            tab4.showschedule(tab5.userid);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        try {
+            tab5.getcourselist(tab5.userid);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
     }
 }
